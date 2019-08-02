@@ -1,0 +1,157 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7450197301737241349
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7450197301737241350}
+  - component: {fileID: 7450197301737241351}
+  - component: {fileID: 7450197301737241348}
+  - component: {fileID: 7450197301737241353}
+  m_Layer: 0
+  m_Name: Terrain0_MainMenu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &7450197301737241350
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7450197301737241349}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!218 &7450197301737241351
+Terrain:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7450197301737241349}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_TerrainData: {fileID: 15600000, guid: c8aec36e28e1d1f4eabf23c808b967c6, type: 2}
+  m_TreeDistance: 5000
+  m_TreeBillboardDistance: 50
+  m_TreeCrossFadeLength: 5
+  m_TreeMaximumFullLODCount: 50
+  m_DetailObjectDistance: 80
+  m_DetailObjectDensity: 1
+  m_HeightmapPixelError: 5
+  m_SplatMapDistance: 1000
+  m_HeightmapMaximumLOD: 0
+  m_CastShadows: 1
+  m_DrawHeightmap: 1
+  m_DrawInstanced: 0
+  m_DrawTreesAndFoliage: 1
+  m_ReflectionProbeUsage: 1
+  m_MaterialType: 0
+  m_LegacySpecular:
+    serializedVersion: 2
+    rgba: 4286545791
+  m_LegacyShininess: 0.078125
+  m_MaterialTemplate: {fileID: 0}
+  m_BakeLightProbesForTrees: 1
+  m_PreserveTreePrototypeLayers: 0
+  m_ScaleInLightmap: 0.0512
+  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  m_GroupingID: 0
+  m_AllowAutoConnect: 1
+--- !u!154 &7450197301737241348
+TerrainCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7450197301737241349}
+  m_Material: {fileID: 0}
+  m_Enabled: 1
+  m_TerrainData: {fileID: 15600000, guid: c8aec36e28e1d1f4eabf23c808b967c6, type: 2}
+  m_EnableTreeColliders: 1
+--- !u!114 &7450197301737241353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7450197301737241349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4531ff2a79e8c8c4e9a70e7d5b874e01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toolModeInt: 2
+  erosionTypeInt: 0
+  generatorTypeInt: 3
+  isBrushOn: 0
+  isBrushHidden: 0
+  isBrushPainting: 0
+  brushPosition: {x: 0, y: 0, z: 0}
+  brushSize: 50
+  brushOpacity: 1
+  brushSoftness: 0.5
+  neighbourhoodInt: 0
+  useDifferenceMaps: 1
+  thermalIterations: 25
+  thermalMinSlope: 1
+  thermalFalloff: 0.5
+  hydraulicTypeInt: 0
+  hydraulicIterations: 25
+  hydraulicMaxSlope: 60
+  hydraulicFalloff: 0.5
+  hydraulicRainfall: 0.01
+  hydraulicEvaporation: 0.5
+  hydraulicSedimentSolubility: 0.01
+  hydraulicSedimentSaturation: 0.1
+  hydraulicVelocityRainfall: 0.01
+  hydraulicVelocityEvaporation: 0.5
+  hydraulicVelocitySedimentSolubility: 0.01
+  hydraulicVelocitySedimentSaturation: 0.1
+  hydraulicVelocity: 20
+  hydraulicMomentum: 1
+  hydraulicEntropy: 0
+  hydraulicDowncutting: 0.1
+  tidalIterations: 25
+  tidalSeaLevel: 50
+  tidalRangeAmount: 5
+  tidalCliffLimit: 60
+  windIterations: 25
+  windDirection: 0
+  windForce: 0.5
+  windLift: 0.01
+  windGravity: 0.5
+  windCapacity: 0.01
+  windEntropy: 0.1
+  windSmoothing: 0.25
+  slopeBlendMinAngle: 16.996904
+  slopeBlendMaxAngle: 51.26935
+  heightBlendPoints: []
+  gradientStyles: []
+  voronoiTypeInt: 1
+  voronoiCells: 8
+  voronoiFeatures: 1
+  voronoiScale: 0
+  voronoiBlend: 1
+  diamondSquareDelta: 0.452
+  diamondSquareBlend: 0.652
+  perlinFrequency: 4
+  perlinAmplitude: 1
+  perlinOctaves: 8
+  perlinBlend: 1
+  smoothBlend: 1
+  smoothIterations: 1
+  normaliseMin: 0
+  normaliseMax: 1
+  normaliseBlend: 1
