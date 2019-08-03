@@ -43,6 +43,7 @@ public class PlayerController : MonoBehaviour
     Transform cameraTransform;
     
     bool is_Gradient_Check = true;
+    bool is_MoveCalculate = true;
    
     // Use this for initialization
     void Awake()
@@ -203,6 +204,8 @@ public class PlayerController : MonoBehaviour
     // 이동 벡터를 계산
     void CalculateMove(float ratio)
     {
+        if (!is_MoveCalculate)
+            return;
 
         float tempMoveY = move.y;
         move.y = 0; //이동에는 xz값만 필요하므로 잠시 저장하고 빼둔다.
