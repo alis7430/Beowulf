@@ -31,6 +31,9 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     float currentSpeed = 0.0f;      // 현재 속도
+    [SerializeField]
+    float curretMoveIncreaseRatio = 1.0f;         // 이동 속도 비율 증/감소 
+    float tempMoveIncreaseRatio = 1.0f;           // 이동 속도 비율 증/감소 임시저장
 
     Transform modelTransform;
     CharacterController cc;
@@ -41,17 +44,19 @@ public class PlayerController : MonoBehaviour
 
     Transform cameraParentTransform;
     Transform cameraTransform;
-    
+
     bool is_Gradient_Check = true;
-    bool is_MoveCalculate = true;
-   
+
+
     // Use this for initialization
     void Awake()
     {
+        // 컴포넌트 클래스 초기화
         cc = GetComponent<CharacterController>();
         modelTransform = transform.GetChild(0);
-
         ani = modelTransform.GetComponent<Animator>();
+
+        // 3인칭 카메라 클래스 초기화
         cameraTransform = Camera.main.transform;
         cameraParentTransform = cameraTransform.parent;
     }
@@ -60,6 +65,9 @@ public class PlayerController : MonoBehaviour
     {
         this.step = STEP.NONE;
         this.next_step = STEP.IDLE;
+
+        curretMoveIncreaseRatio = 1.0f;
+        tempMoveIncreaseRatio = 1.0f;
     }
 
     private void Update()
@@ -82,21 +90,22 @@ public class PlayerController : MonoBehaviour
                     }
                     break;
                 case STEP.MOVE:
-                    if(currentSpeed == 0)
+                    if (currentSpeed == 0)
                     {
                         next_step = STEP.IDLE;
                     }
                     break;
                 case STEP.JUMP:
-                    if(stepTimer > 0.7f && cc.isGrounded)
+                    if (stepTimer > 0.7f && cc.isGrounded)
                     {
                         next_step = STEP.IDLE;
+                        curretMoveIncreaseRatio = tempMoveIncreaseRatio;
                     }
                     break;
             }
         }
         // 상태가 변화할 때
-        while(this.next_step != STEP.NONE)
+        while (this.next_step != STEP.NONE)
         {
             this.step = this.next_step;
             this.next_step = STEP.NONE;
@@ -105,14 +114,19 @@ public class PlayerController : MonoBehaviour
             switch (this.step)
             {
                 case STEP.IDLE:
+                    is_Gradient_Check = true;       // 점프 중에는 경사로 탐색을 안함
                     ani.SetBool("isJump", false);
-                    is_Gradient_Check = true;
                     break;
                 case STEP.MOVE:
                     break;
                 case STEP.JUMP:
+                    ani.Rebind();                   // 실행중이던 착지 애니메이션 때문에 애니메이터 초기화
+                    is_Gradient_Check = false;      // 점프 중에는 경사로 탐색을 안함
                     ani.SetBool("isJump", true);
-                    is_Gradient_Check = false;
+
+
+                    tempMoveIncreaseRatio = curretMoveIncreaseRatio;    // 원래 이동 속도 증가 비율을 저장해 둔다
+                    curretMoveIncreaseRatio *= 0.02f;                   // 점프 시 이동 속도 증가 비율 감소
                     break;
                 case STEP.ATTACK1:
                     break;
@@ -147,26 +161,30 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        //플레이어 이동 및 카메라 로직 처리
+        // 플레이어 이동 및 카메라 로직 처리
         Balance();
         CameraDistanceCtrl();
 
+        // 플레이어가 땅에 있을 경우
         if (cc.isGrounded)
         {
             GradientCheck();
             ani.SetBool("isGrounded", true);
-            CalculateMove(1.0f);
+            CalculateMove(curretMoveIncreaseRatio);
         }
+        // 공중에 떠 있는 경우
         else
         {
             ani.SetBool("isGrounded", false);
             move.y -= gravity * Time.deltaTime;
             CalculateMove(0.1f);
         }
+
         cc.Move(move * Time.deltaTime);
         Debug.Log(move);
     }
 
+    // 카메라 움직임에 대한 input을
     void LateUpdate()
     {
         cameraParentTransform.position = transform.position + Vector3.up * cameraHeight;  //캐릭터의 머리 높이쯤
@@ -177,8 +195,8 @@ public class PlayerController : MonoBehaviour
             mouseMove.x = -20;
         else if (30 < mouseMove.x)
             mouseMove.x = 30;
-        //여기서 헷갈리면 안 되는게 GetAxisRaw("Mouse XY") 는 실제 마우스의 움직임의 x좌표 y좌표를 가져오지만 회전은 축 기준이라 x가 위아래고 y가 좌우이다.
 
+        //여기서 헷갈리면 안 되는게 GetAxisRaw("Mouse XY") 는 실제 마우스의 움직임의 x좌표 y좌표를 가져오지만 회전은 축 기준이라 x가 위아래고 y가 좌우이다.
         cameraParentTransform.localEulerAngles = mouseMove;
     }
 
@@ -194,7 +212,7 @@ public class PlayerController : MonoBehaviour
     void CameraDistanceCtrl()
     {
         Camera.main.transform.localPosition += new Vector3(0, 0, Input.GetAxisRaw("Mouse ScrollWheel") * 2.0f); //휠로 카메라의 거리를 조절한다.
-       
+
         if (-1 < Camera.main.transform.localPosition.z)
             Camera.main.transform.localPosition = new Vector3(Camera.main.transform.localPosition.x, Camera.main.transform.localPosition.y, -1);    //최대로 가까운 수치
         else if (Camera.main.transform.localPosition.z < -5)
@@ -202,11 +220,8 @@ public class PlayerController : MonoBehaviour
     }
 
     // 이동 벡터를 계산
-    void CalculateMove(float ratio)
+    void CalculateMove(float increaseRatio)
     {
-        if (!is_MoveCalculate)
-            return;
-
         float tempMoveY = move.y;
         move.y = 0; //이동에는 xz값만 필요하므로 잠시 저장하고 빼둔다.
 
@@ -225,36 +240,33 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButton("Horizontal") || Input.GetButton("Vertical"))
         {
             Quaternion cameraRotation = cameraParentTransform.rotation;
-            cameraRotation.x = cameraRotation.z = 0;    //y축만 필요하므로 나머지 값은 0으로 바꾼다.
-            //자연스러움을 위해 Slerp로 회전시킨다.
-            transform.rotation = Quaternion.Slerp(transform.rotation, cameraRotation, 10.0f * Time.deltaTime);
-            if (move != Vector3.zero)//Quaternion.LookRotation는 (0,0,0)이 들어가면 경고를 내므로 예외처리 해준다.
+            cameraRotation.x = cameraRotation.z = 0;        //y축만 필요하므로 나머지 값은 0으로 바꾼다.
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, cameraRotation, 10.0f * Time.deltaTime);      //자연스러움을 위해 Slerp로 회전시킨다.
+
+            if (move != Vector3.zero)       //Quaternion.LookRotation는 (0,0,0)이 들어가면 경고를 내므로 예외처리 해준다.
             {
                 Quaternion characterRotation = Quaternion.LookRotation(move);
                 characterRotation.x = characterRotation.z = 0;
                 modelTransform.rotation = Quaternion.Slerp(modelTransform.rotation, characterRotation, 5.0f * Time.deltaTime);
             }
-            if(Input.GetKey(KeyCode.LeftShift))
+
+            if (Input.GetKey(KeyCode.LeftShift) && step == STEP.MOVE)        // 이동중 shift 키가 눌렸을 때
             {
-                //관성을 위해 MoveTowards를 활용하여 서서히 이동하도록 한다.
-                move = Vector3.MoveTowards(move, inputMoveXZ * 1.5f, ratio * runSpeed);
+                move = Vector3.MoveTowards(move, inputMoveXZ * 1.5f, increaseRatio * runSpeed);     //관성을 위해 MoveTowards를 활용하여 서서히 이동하도록 한다.(달리기)
             }
             else
             {
-                //관성을 위해 MoveTowards를 활용하여 서서히 이동하도록 한다.
-                move = Vector3.MoveTowards(move, inputMoveXZ, ratio * runSpeed);
+                move = Vector3.MoveTowards(move, inputMoveXZ, increaseRatio * runSpeed);    //관성을 위해 MoveTowards를 활용하여 서서히 이동하도록 한다.(걷기)
             }
         }
         else
         {
-            //조작이 없으면 서서히 멈춘다.
-            move = Vector3.MoveTowards(move, Vector3.zero, runSpeed * ratio);
+            move = Vector3.MoveTowards(move, Vector3.zero, runSpeed * increaseRatio);       //조작이 없으면 서서히 멈춘다.
         }
 
-        // 현재 속도를 구한다.
-        currentSpeed = move.magnitude;
-
-        move.y = tempMoveY; //y값 복구
+        currentSpeed = move.magnitude;       // 현재 속도를 구한다.
+        move.y = tempMoveY;                  //y값 복구
     }
 
     //경사로를 구분하기 위해 밑으로 레이를 쏘아 땅을 확인한다.
@@ -277,7 +289,7 @@ public class PlayerController : MonoBehaviour
     //모종의 이유로 기울어진다면 바로잡는다.
     void Balance()
     {
-        if (transform.eulerAngles.x != 0 || transform.eulerAngles.z != 0)   
+        if (transform.eulerAngles.x != 0 || transform.eulerAngles.z != 0)
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
     }
 }

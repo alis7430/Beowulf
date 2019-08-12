@@ -1289,6 +1289,14 @@ PrefabInstance:
       propertyPath: runSpeed
       value: 2.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1854311992, guid: d2c3ee1acc32cc84885a88740e41ec51, type: 3}
+      propertyPath: currentSpeed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1854311992, guid: d2c3ee1acc32cc84885a88740e41ec51, type: 3}
+      propertyPath: curretMoveIncreaseRatio
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3175379699531777514, guid: d2c3ee1acc32cc84885a88740e41ec51,
         type: 3}
       propertyPath: m_LocalScale.x
