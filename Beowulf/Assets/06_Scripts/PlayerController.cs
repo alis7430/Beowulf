@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
         ATTACK1,
         ATTACK2,
         ATTACK3,
-        DEFENSE,
+        BLOCKING,
         DIE,
         NUM_OF_STATES
     }
@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour
     Transform cameraTransform;
 
     bool is_Gradient_Check = true;
+    bool is_Calculate_Move = true;
 
 
     // Use this for initialization
@@ -88,11 +89,19 @@ public class PlayerController : MonoBehaviour
                     {
                         next_step = STEP.JUMP;
                     }
+                    if(Input.GetMouseButton(1))
+                    {
+                        next_step = STEP.BLOCKING;
+                    }
                     break;
                 case STEP.MOVE:
                     if (currentSpeed == 0)
                     {
                         next_step = STEP.IDLE;
+                    }
+                    if (Input.GetKeyDown(KeyCode.Space))
+                    {
+                        next_step = STEP.JUMP;
                     }
                     break;
                 case STEP.JUMP:
@@ -100,6 +109,12 @@ public class PlayerController : MonoBehaviour
                     {
                         next_step = STEP.IDLE;
                         curretMoveIncreaseRatio = tempMoveIncreaseRatio;
+                    }
+                    break;
+                case STEP.BLOCKING:
+                    if(Input.GetMouseButtonUp(1))
+                    {
+                        next_step = STEP.IDLE;
                     }
                     break;
             }
@@ -114,8 +129,10 @@ public class PlayerController : MonoBehaviour
             switch (this.step)
             {
                 case STEP.IDLE:
-                    is_Gradient_Check = true;       // 점프 중에는 경사로 탐색을 안함
+                    is_Gradient_Check = true;       // 점프 중에는 경사로 탐색을 안함.
+                    is_Calculate_Move = true;
                     ani.SetBool("isJump", false);
+                    ani.SetBool("Blocking", false);
                     break;
                 case STEP.MOVE:
                     break;
@@ -123,10 +140,11 @@ public class PlayerController : MonoBehaviour
                     ani.Rebind();                   // 실행중이던 착지 애니메이션 때문에 애니메이터 초기화
                     is_Gradient_Check = false;      // 점프 중에는 경사로 탐색을 안함
                     ani.SetBool("isJump", true);
-
-
-                    tempMoveIncreaseRatio = curretMoveIncreaseRatio;    // 원래 이동 속도 증가 비율을 저장해 둔다
-                    curretMoveIncreaseRatio *= 0.02f;                   // 점프 시 이동 속도 증가 비율 감소
+                    if (currentSpeed < 2.5)
+                    {
+                        tempMoveIncreaseRatio = curretMoveIncreaseRatio;    // 원래 이동 속도 증가 비율을 저장해 둔다
+                        curretMoveIncreaseRatio *= 0.02f;                   // 점프 시 이동 속도 증가 비율 감소
+                    }
                     break;
                 case STEP.ATTACK1:
                     break;
@@ -134,7 +152,9 @@ public class PlayerController : MonoBehaviour
                     break;
                 case STEP.ATTACK3:
                     break;
-                case STEP.DEFENSE:
+                case STEP.BLOCKING:
+                    ani.SetBool("Blocking", true);
+                    is_Calculate_Move = false;
                     break;
                 case STEP.DIE:
                     break;
@@ -151,19 +171,20 @@ public class PlayerController : MonoBehaviour
                 ani.SetFloat("Speed", currentSpeed);
                 break;
             case STEP.JUMP:
-                if (stepTimer >= 0.65f)
+                ani.SetFloat("Speed", currentSpeed);
+                if (stepTimer >= 0.45f)
                 {
                     StartJump();
                 }
+
                 break;
         }
     }
 
+    // 플레이어 이동 
     void FixedUpdate()
     {
-        // 플레이어 이동 및 카메라 로직 처리
-        Balance();
-        CameraDistanceCtrl();
+        BalancePlayerAngle();
 
         // 플레이어가 땅에 있을 경우
         if (cc.isGrounded)
@@ -184,7 +205,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log(move);
     }
 
-    // 카메라 움직임에 대한 input을
+    // 카메라 위치 및 로직 처리
     void LateUpdate()
     {
         cameraParentTransform.position = transform.position + Vector3.up * cameraHeight;  //캐릭터의 머리 높이쯤
@@ -198,6 +219,8 @@ public class PlayerController : MonoBehaviour
 
         //여기서 헷갈리면 안 되는게 GetAxisRaw("Mouse XY") 는 실제 마우스의 움직임의 x좌표 y좌표를 가져오지만 회전은 축 기준이라 x가 위아래고 y가 좌우이다.
         cameraParentTransform.localEulerAngles = mouseMove;
+
+        ControlCameraDistance();
     }
 
     // 호출시 1회 점프
@@ -209,19 +232,21 @@ public class PlayerController : MonoBehaviour
     }
 
     // 휠로 카메라를 조절
-    void CameraDistanceCtrl()
+    void ControlCameraDistance()
     {
-        Camera.main.transform.localPosition += new Vector3(0, 0, Input.GetAxisRaw("Mouse ScrollWheel") * 2.0f); //휠로 카메라의 거리를 조절한다.
+        cameraTransform.localPosition += new Vector3(0, 0, Input.GetAxisRaw("Mouse ScrollWheel") * 2.0f); //휠로 카메라의 거리를 조절한다.
 
-        if (-1 < Camera.main.transform.localPosition.z)
-            Camera.main.transform.localPosition = new Vector3(Camera.main.transform.localPosition.x, Camera.main.transform.localPosition.y, -1);    //최대로 가까운 수치
-        else if (Camera.main.transform.localPosition.z < -5)
-            Camera.main.transform.localPosition = new Vector3(Camera.main.transform.localPosition.x, Camera.main.transform.localPosition.y, -5);    //최대로 먼 수치
+        if (-1 < cameraTransform.localPosition.z)
+            cameraTransform.localPosition = new Vector3(cameraTransform.localPosition.x, cameraTransform.localPosition.y, -1);    //최대로 가까운 수치
+        else if (cameraTransform.localPosition.z < -5)
+            cameraTransform.localPosition = new Vector3(cameraTransform.localPosition.x, cameraTransform.localPosition.y, -5);    //최대로 먼 수치
     }
 
     // 이동 벡터를 계산
     void CalculateMove(float increaseRatio)
     {
+        if (!is_Calculate_Move)
+            return;
         float tempMoveY = move.y;
         move.y = 0; //이동에는 xz값만 필요하므로 잠시 저장하고 빼둔다.
 
@@ -251,7 +276,7 @@ public class PlayerController : MonoBehaviour
                 modelTransform.rotation = Quaternion.Slerp(modelTransform.rotation, characterRotation, 5.0f * Time.deltaTime);
             }
 
-            if (Input.GetKey(KeyCode.LeftShift) && step == STEP.MOVE)        // 이동중 shift 키가 눌렸을 때
+            if (Input.GetKey(KeyCode.LeftShift) && step == STEP.MOVE )        // 이동중 shift 키가 눌렸을 때
             {
                 move = Vector3.MoveTowards(move, inputMoveXZ * 1.5f, increaseRatio * runSpeed);     //관성을 위해 MoveTowards를 활용하여 서서히 이동하도록 한다.(달리기)
             }
@@ -287,7 +312,7 @@ public class PlayerController : MonoBehaviour
     }
 
     //모종의 이유로 기울어진다면 바로잡는다.
-    void Balance()
+    void BalancePlayerAngle()
     {
         if (transform.eulerAngles.x != 0 || transform.eulerAngles.z != 0)
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
