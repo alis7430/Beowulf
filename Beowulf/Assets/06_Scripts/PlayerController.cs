@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    BaseCharacter beowulfStatus;
+
     public static float runSpeed = 2.5f;            // 달리는 속도
     public static float jumpSpeed = 4.0f;           // 점프 속도
+    public static float attackSpeedRatio = 1.0f;    // 공격속도
     public static float gravity = 9.8f;             // 중력 크기
     public static float mouseSensitivity = 2.0f;    // 카메라 마우스 감도
     public static float cameraHeight = 1.75f;       // 카메라 높이
+
+
+    public GameObject battleAxe;
 
     // 상태 열거체
     public enum STEP
@@ -17,6 +23,7 @@ public class PlayerController : MonoBehaviour
         IDLE = 0,
         MOVE,
         JUMP,
+        WEAPON_CHANGE,
         ATTACK1,
         ATTACK2,
         ATTACK3,
@@ -33,18 +40,21 @@ public class PlayerController : MonoBehaviour
     float currentSpeed = 0.0f;      // 현재 속도
     [SerializeField]
     float curretMoveIncreaseRatio = 1.0f;         // 이동 속도 비율 증/감소 
+
     float tempMoveIncreaseRatio = 1.0f;           // 이동 속도 비율 증/감소 임시저장
 
-    Transform modelTransform;
-    CharacterController cc;
-    Animator ani;
+    Transform modelTransform;       // 플레이어 모델의 트랜스폼    
+    CharacterController cc;         // 캐릭터 컨트롤러 컴포넌트
+    Animator ani;                   // 애니메이터를 저장
 
-    Vector3 mouseMove;
-    Vector3 move;
+    Vector3 mouseMove;              // 마우스 움직임을 저장
+    Vector3 move;                   // 플레이어의 이동 벡터
 
-    Transform cameraParentTransform;
-    Transform cameraTransform;
+    Transform cameraParentTransform;    // 카메라의 부모 트랜스폼
+    Transform cameraTransform;          // 메인 카메라의 트랜스폼
 
+
+    bool is_Player_Armed = false;
     bool is_Gradient_Check = true;
     bool is_Calculate_Move = true;
 
@@ -69,6 +79,8 @@ public class PlayerController : MonoBehaviour
 
         curretMoveIncreaseRatio = 1.0f;
         tempMoveIncreaseRatio = 1.0f;
+
+        battleAxe.SetActive(false);
     }
 
     private void Update()
@@ -89,9 +101,22 @@ public class PlayerController : MonoBehaviour
                     {
                         next_step = STEP.JUMP;
                     }
-                    if(Input.GetMouseButton(1))
+                    if (Input.GetMouseButtonDown(0))
                     {
-                        next_step = STEP.BLOCKING;
+                        // 공격
+                        if (is_Player_Armed)
+                            next_step = STEP.ATTACK1;
+                    }
+                    if (Input.GetMouseButton(1))
+                    {
+                        // 블로킹
+                        if (is_Player_Armed)
+                            next_step = STEP.BLOCKING; 
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.X))
+                    {
+                        next_step = STEP.WEAPON_CHANGE;
                     }
                     break;
                 case STEP.MOVE:
@@ -105,10 +130,46 @@ public class PlayerController : MonoBehaviour
                     }
                     break;
                 case STEP.JUMP:
-                    if (stepTimer > 0.7f && cc.isGrounded)
+                    if (stepTimer > 0.7f && cc.isGrounded)  // 점프 애니메이션 때문에 0.7초 이후에 상태 변환
                     {
                         next_step = STEP.IDLE;
                         curretMoveIncreaseRatio = tempMoveIncreaseRatio;
+                    }
+                    break;
+                case STEP.WEAPON_CHANGE:
+                    if(stepTimer > 1.1f)    // 무기교체 애니메이션 때문에 1.1초 이후에 상태 변환
+                    {
+                        next_step = STEP.IDLE;
+                    }
+                    break;
+                case STEP.ATTACK1:
+                    ani.Play("Standing Melee Combo Attack1");
+                    if (Input.GetMouseButtonDown(0) && stepTimer < attackSpeedRatio * 1.3f && stepTimer > attackSpeedRatio * 0.9f)
+                    {
+                        next_step = STEP.ATTACK2;
+                    }
+                    if(stepTimer > 1.2f)
+                    {
+                        next_step = STEP.IDLE;
+                        ani.SetInteger("Attack", 0);
+                    }
+                    break;
+                case STEP.ATTACK2:
+                    if (Input.GetMouseButtonDown(0) && stepTimer < attackSpeedRatio* 0.9f && stepTimer > attackSpeedRatio * 0.5f)
+                    {
+                        next_step = STEP.ATTACK3;
+                    }
+                    if (stepTimer > 0.8f)
+                    {
+                        next_step = STEP.IDLE;
+                        ani.SetInteger("Attack", 0);
+                    }
+                    break;
+                case STEP.ATTACK3:
+                    if (stepTimer > 1.5f * attackSpeedRatio)
+                    {
+                        next_step = STEP.IDLE;
+                        ani.SetInteger("Attack", 0);
                     }
                     break;
                 case STEP.BLOCKING:
@@ -129,8 +190,8 @@ public class PlayerController : MonoBehaviour
             switch (this.step)
             {
                 case STEP.IDLE:
-                    is_Gradient_Check = true;       // 점프 중에는 경사로 탐색을 안함.
-                    is_Calculate_Move = true;
+                    is_Gradient_Check = true;       // 기본 상태에서는 경사로 검색을 해줌
+                    is_Calculate_Move = true;       // 기본 상태에서는 이동이 가능
                     ani.SetBool("isJump", false);
                     ani.SetBool("Blocking", false);
                     break;
@@ -146,15 +207,36 @@ public class PlayerController : MonoBehaviour
                         curretMoveIncreaseRatio *= 0.02f;                   // 점프 시 이동 속도 증가 비율 감소
                     }
                     break;
+                case STEP.WEAPON_CHANGE:
+                    is_Calculate_Move = false;
+                    if (!is_Player_Armed)
+                    {
+                        is_Player_Armed = true;
+                        ani.SetBool("EquipWeapon", true);
+                        battleAxe.SetActive(true);
+                    }
+                    else
+                    {
+                        is_Player_Armed = false;
+                        ani.SetBool("EquipWeapon", false);
+                    }
+
+                    break;
                 case STEP.ATTACK1:
+                    is_Calculate_Move = false;
+                    ani.SetInteger("Attack", 1);
                     break;
                 case STEP.ATTACK2:
+                    is_Calculate_Move = false;
+                    ani.SetInteger("Attack", 2);
                     break;
                 case STEP.ATTACK3:
+                    is_Calculate_Move = false;
+                    ani.SetInteger("Attack", 3);
                     break;
                 case STEP.BLOCKING:
                     ani.SetBool("Blocking", true);
-                    is_Calculate_Move = false;
+                    is_Calculate_Move = false;      // 막고있는 동안에는 이동 불가 
                     break;
                 case STEP.DIE:
                     break;
@@ -175,6 +257,13 @@ public class PlayerController : MonoBehaviour
                 if (stepTimer >= 0.45f)
                 {
                     StartJump();
+                }
+                break;
+            case STEP.WEAPON_CHANGE:
+                if(!is_Player_Armed && stepTimer >= 0.6f)
+                {
+
+                    battleAxe.SetActive(false);
                 }
 
                 break;
@@ -202,7 +291,7 @@ public class PlayerController : MonoBehaviour
         }
 
         cc.Move(move * Time.deltaTime);
-        Debug.Log(move);
+        //Debug.Log(move);
     }
 
     // 카메라 위치 및 로직 처리
@@ -223,7 +312,16 @@ public class PlayerController : MonoBehaviour
         ControlCameraDistance();
     }
 
-    // 호출시 1회 점프
+    // ----------------------------------------------------------
+    // public Fuctions
+    // ----------------------------------------------------------
+
+
+    // ----------------------------------------------------------
+    // Private Fuctions
+    // ----------------------------------------------------------*/
+
+    // 호출 시 플레이어가 1회 점프합니다.
     void StartJump()
     {
         // 땅에 있을 때에만 점프 가능
@@ -231,7 +329,7 @@ public class PlayerController : MonoBehaviour
             move.y = jumpSpeed;
     }
 
-    // 휠로 카메라를 조절
+    // 휠로 카메라를 조절합니다. (Update호출)
     void ControlCameraDistance()
     {
         cameraTransform.localPosition += new Vector3(0, 0, Input.GetAxisRaw("Mouse ScrollWheel") * 2.0f); //휠로 카메라의 거리를 조절한다.
@@ -242,7 +340,7 @@ public class PlayerController : MonoBehaviour
             cameraTransform.localPosition = new Vector3(cameraTransform.localPosition.x, cameraTransform.localPosition.y, -5);    //최대로 먼 수치
     }
 
-    // 이동 벡터를 계산
+    // 이동 벡터를 계산하고 움직입니다. (Update호출)
     void CalculateMove(float increaseRatio)
     {
         if (!is_Calculate_Move)
@@ -294,7 +392,7 @@ public class PlayerController : MonoBehaviour
         move.y = tempMoveY;                  //y값 복구
     }
 
-    //경사로를 구분하기 위해 밑으로 레이를 쏘아 땅을 확인한다.
+    //경사로를 구분하기 위해 밑으로 레이를 쏘아 땅을 확인한다. (Update호출)
     void GradientCheck()
     {
         if (!is_Gradient_Check)
@@ -311,7 +409,7 @@ public class PlayerController : MonoBehaviour
             move.y = -1;
     }
 
-    //모종의 이유로 기울어진다면 바로잡는다.
+    //모종의 이유로 기울어진다면 바로잡는다. (Update호출)
     void BalancePlayerAngle()
     {
         if (transform.eulerAngles.x != 0 || transform.eulerAngles.z != 0)
