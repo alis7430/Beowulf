@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    BaseCharacter beowulfStatus;
+    BaseCharacter stats;
 
     public static float runSpeed = 2.5f;            // 달리는 속도
     public static float jumpSpeed = 4.0f;           // 점프 속도

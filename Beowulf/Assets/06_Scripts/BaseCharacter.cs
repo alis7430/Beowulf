@@ -50,6 +50,18 @@ public class BaseCharacter
         set { this.health = value; }
     }
 
+    public BaseCharacter()
+    {
+        NAME = "no data";
+        DESCRIPTION = "no description";
+        STRENGTH = 0;
+        DEFENSE = 0;
+        DEXTERITY = 0;
+        INTELLIGENCE = 0;
+        HEALTH = 0;
+    }
+
+
     #endregion
 
 }

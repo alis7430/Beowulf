@@ -153,12 +153,6 @@ Transform:
   m_Father: {fileID: 1207774032}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &32061635 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5147666963438773030, guid: d2c3ee1acc32cc84885a88740e41ec51,
-    type: 3}
-  m_PrefabInstance: {fileID: 6848318218280059668}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &46581114
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1137,6 +1131,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1522904655, guid: 78057102f8caf4a46965678d3e7aa9cc, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1129523910, guid: 78057102f8caf4a46965678d3e7aa9cc, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78057102f8caf4a46965678d3e7aa9cc, type: 3}
 --- !u!1 &817850928
@@ -1240,6 +1242,26 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 421256222}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1081047138 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 305413107, guid: 78057102f8caf4a46965678d3e7aa9cc,
+    type: 3}
+  m_PrefabInstance: {fileID: 719582317}
+  m_PrefabAsset: {fileID: 0}
+--- !u!136 &1081047141
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081047138}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 1.9930534
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9518833, z: 0}
 --- !u!4 &1114906624 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: bcae914220acd4907840a029bb9d9aec,
@@ -1606,9 +1628,5 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1854311992, guid: d2c3ee1acc32cc84885a88740e41ec51, type: 3}
-      propertyPath: battleAxe
-      value: 
-      objectReference: {fileID: 32061635}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2c3ee1acc32cc84885a88740e41ec51, type: 3}
