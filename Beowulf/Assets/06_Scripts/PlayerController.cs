@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+//-----------------------------------------------------------
+// Scripts\PlayerController.cs
+//
+// 플레이어의 상태 및 움직임을 관리하는 클래스
+// 전체적으로 FSM을 이용하여 캐릭터의 움직임과 상태를 제어한다.
+//-----------------------------------------------------------
 public class PlayerController : MonoBehaviour
 {
     BaseCharacter stats;
 
-    public static float runSpeed = 2.5f;            // 달리는 속도
-    public static float jumpSpeed = 4.0f;           // 점프 속도
-    public static float attackSpeedRatio = 1.0f;    // 공격속도
-    public static float gravity = 9.8f;             // 중력 크기
-    public static float mouseSensitivity = 2.0f;    // 카메라 마우스 감도
-    public static float cameraHeight = 1.75f;       // 카메라 높이
+    #region variables
 
-
-    public GameObject battleAxe;
-
-    // 상태 열거체
+    //-----------------------------------------------------------
+    // 플레이어 상태를 나타내는 열거체
     public enum STEP
     {
         NONE = -1,
@@ -31,7 +32,19 @@ public class PlayerController : MonoBehaviour
         DIE,
         NUM_OF_STATES
     }
+    //-----------------------------------------------------------
+    // 플레이어 데이터 전역변수
+    public static float runSpeed = 2.5f;            // 달리는 속도
+    public static float jumpSpeed = 4.0f;           // 점프 속도
+    public static float attackSpeedRatio = 1.0f;    // 공격속도
+    public static float gravity = 9.8f;             // 중력 크기
+    public static float mouseSensitivity = 2.0f;    // 카메라 마우스 감도
+    public static float cameraHeight = 1.75f;       // 카메라 높이
 
+
+    public GameObject battleAxe;    // 플레이어 무기
+
+    // 플레이어 상태 및 상태 타이머 변수
     public STEP step = STEP.NONE;        // 현재 상태
     public STEP next_step = STEP.NONE;   // 다음 상태
     public float stepTimer = 0.0f;
@@ -39,8 +52,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     float currentSpeed = 0.0f;      // 현재 속도
     [SerializeField]
-    float curretMoveIncreaseRatio = 1.0f;         // 이동 속도 비율 증/감소 
-
+    float curretMoveIncreaseRatio = 1.0f;         // 현재 이동 속도 비율 증/감소 
     float tempMoveIncreaseRatio = 1.0f;           // 이동 속도 비율 증/감소 임시저장
 
     Transform modelTransform;       // 플레이어 모델의 트랜스폼    
@@ -57,8 +69,10 @@ public class PlayerController : MonoBehaviour
     bool is_Player_Armed = false;
     bool is_Gradient_Check = true;
     bool is_Calculate_Move = true;
+    #endregion
+    //-----------------------------------------------------------
 
-
+    #region methods
     // Use this for initialization
     void Awake()
     {
@@ -82,7 +96,8 @@ public class PlayerController : MonoBehaviour
 
         battleAxe.SetActive(false);
     }
-
+    //-----------------------------------------------------------
+    // Update문에서 플레이어 상태 검사 및 동작 수행
     private void Update()
     {
         this.stepTimer += Time.deltaTime;
@@ -269,7 +284,7 @@ public class PlayerController : MonoBehaviour
                 break;
         }
     }
-
+    //-----------------------------------------------------------
     // 플레이어 이동 
     void FixedUpdate()
     {
@@ -293,7 +308,7 @@ public class PlayerController : MonoBehaviour
         cc.Move(move * Time.deltaTime);
         //Debug.Log(move);
     }
-
+    //-----------------------------------------------------------
     // 카메라 위치 및 로직 처리
     void LateUpdate()
     {
@@ -321,6 +336,7 @@ public class PlayerController : MonoBehaviour
     // Private Fuctions
     // ----------------------------------------------------------*/
 
+    //-----------------------------------------------------------
     // 호출 시 플레이어가 1회 점프합니다.
     void StartJump()
     {
@@ -329,6 +345,7 @@ public class PlayerController : MonoBehaviour
             move.y = jumpSpeed;
     }
 
+    //-----------------------------------------------------------
     // 휠로 카메라를 조절합니다. (Update호출)
     void ControlCameraDistance()
     {
@@ -339,7 +356,7 @@ public class PlayerController : MonoBehaviour
         else if (cameraTransform.localPosition.z < -5)
             cameraTransform.localPosition = new Vector3(cameraTransform.localPosition.x, cameraTransform.localPosition.y, -5);    //최대로 먼 수치
     }
-
+    //-----------------------------------------------------------
     // 이동 벡터를 계산하고 움직입니다. (Update호출)
     void CalculateMove(float increaseRatio)
     {
@@ -392,6 +409,7 @@ public class PlayerController : MonoBehaviour
         move.y = tempMoveY;                  //y값 복구
     }
 
+    //-----------------------------------------------------------
     //경사로를 구분하기 위해 밑으로 레이를 쏘아 땅을 확인한다. (Update호출)
     void GradientCheck()
     {
@@ -408,11 +426,13 @@ public class PlayerController : MonoBehaviour
         else
             move.y = -1;
     }
-
+    //-----------------------------------------------------------
     //모종의 이유로 기울어진다면 바로잡는다. (Update호출)
     void BalancePlayerAngle()
     {
         if (transform.eulerAngles.x != 0 || transform.eulerAngles.z != 0)
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
     }
+    //-----------------------------------------------------------
+    #endregion
 }

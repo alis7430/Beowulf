@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-//GameManager.cs
+//-----------------------------------------------------------
+// Scripts\GameLogic\GameManager.cs
+//
+// 싱글톤으로 구현된 GameManager 클래스입니다.
+// 게임의 전체적인 흐름을 제어하는 함수들을 가지고 있습니다.
+// 게임매니저 인스턴스를 사용하여 함수를 호출하십시오.
+//-----------------------------------------------------------
 public class GameManager : MonoBehaviour
 {
-    // 싱글톤 패턴을 사용하기 위한 인스턴스 변수
-    private static GameManager _instance;
+    #region C# properties
+    //-----------------------------------------------------------
     // 인스턴스에 접근하기 위한 프로퍼티
     public static GameManager Instance
     {
@@ -23,26 +29,33 @@ public class GameManager : MonoBehaviour
             return _instance;
         }
     }
+    #endregion
 
+    #region variables
+    // 싱글톤 패턴을 사용하기 위한 인스턴스 변수
+    private static GameManager _instance;
+    #endregion
+
+    //-----------------------------------------------------------
+    #region methods
     private void Awake()
     {
+        // 인스턴스가 존재하지 않는 경우, 이 객체를 인스턴스로 만든다.
+        if (_instance == null)
+        {
+            _instance = this;
+            DontDestroyOnLoad(gameObject);  // 씬이 전환되더라도 선언되었던 인스턴스가 파괴되지 않는다.
+        }
+        // 인스턴스가 존재하는 경우 새로생기는 인스턴스를 삭제한다.
+        else
+            DestroyImmediate(gameObject);
+        
+
         if (SceneManager.GetActiveScene().name == "02_Tutorial")
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
-
-        if (_instance == null)
-        {
-            _instance = this;
-        }
-        // 인스턴스가 존재하는 경우 새로생기는 인스턴스를 삭제한다.
-        else if (_instance != this)
-        {
-            Destroy(gameObject);
-        }
-        // 아래의 함수를 사용하여 씬이 전환되더라도 선언되었던 인스턴스가 파괴되지 않는다.
-        DontDestroyOnLoad(gameObject);
     }
 
     private void Update()
@@ -64,4 +77,6 @@ public class GameManager : MonoBehaviour
         Application.Quit(); // 어플리케이션 종료
 #endif
     }
+    //-----------------------------------------------------------
+    #endregion
 }

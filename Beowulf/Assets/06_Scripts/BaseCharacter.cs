@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//-----------------------------------------------------------
+//Scripts\BaseCharacter.cs
+//
+//캐릭터 스탯 데이터를 저장하는 클래스
+//-----------------------------------------------------------
 public class BaseCharacter
 {
     #region Status value(캐릭터 스텟)
