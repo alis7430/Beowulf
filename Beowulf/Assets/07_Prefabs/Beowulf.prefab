@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 3347856207972284440}
   - component: {fileID: 3347856207972284439}
   - component: {fileID: 1854311992}
+  - component: {fileID: 1728457966}
   m_Layer: 0
   m_Name: Beowulf
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -50,7 +51,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1854311992
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,12 +64,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 215be2d14e5c22341a99e79eb9b71fa6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  battleAxe: {fileID: 5147666963438773030}
+  name: Beowulf
+  description: Player Character
+  health: 100
+  strength: 10
+  defense: 10
+  dexterity: 10
+  intelligence: 10
   step: -1
   next_step: -1
   stepTimer: 0
+  battleAxe: {fileID: 5147666963438773030}
+  runSpeed: 2.5
+  jumpSpeed: 4
   currentSpeed: 0
   curretMoveIncreaseRatio: 1
+--- !u!114 &1728457966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3347856207972284437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c81d8a22ea8831d4bb39c82671f4633d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aspectName: 0
+--- !u!65 &459434899
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5147666963438773030}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.7360109, y: 0.17236242, z: 1.4760015}
+  m_Center: {x: 0.6045572, y: -0.07354321, z: 0.32172823}
 --- !u!1001 &7596310116338347760
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -89,7 +125,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: 501a51c3a46632b4aa0416496979f91f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 501a51c3a46632b4aa0416496979f91f,
         type: 3}

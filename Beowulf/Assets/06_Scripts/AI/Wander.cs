@@ -55,5 +55,10 @@ public class Wander : MonoBehaviour
         targetPosition = new Vector3(Random.Range(minX, maxX), 1.0f,
             Random.Range(minZ, maxZ));
     }
+
+    private void OnDrawGizmos()
+    {
+        Debug.DrawLine(transform.position, targetPosition, Color.white);
+    }
     #endregion
 }

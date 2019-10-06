@@ -1,0 +1,69 @@
+tree("Root")
+	parallel
+		repeat mute tree("BeAlive")
+		//repeat mute tree("Die")
+
+tree("BeAlive")
+	fallback
+		//tree("ReturnToPlace")
+		tree("Attack")
+		tree("LookTarget")
+		tree("Patroll")
+
+tree("ReturnToPlace")
+	while IsOutOfBounds
+		repeat
+			sequence
+				SetDestination
+				parallel
+					LookAtDestination
+					MoveToDestination
+
+tree("LookTarget")
+	while
+		sequence
+			IsVisibleTarget
+			not HasEnemy
+
+		repeat
+			sequence
+				SetDestination_Enemy
+				parallel
+					LookAtDestination
+					IsTargetThreaten(3.5)
+
+tree("Patroll")
+	while
+		sequence
+			not HasEnemy
+			not IsVisibleTarget
+
+		repeat
+			sequence
+					SetRandomDestination
+					parallel
+						LookAtDestination
+						MoveToDestination
+					Idle(4.0)
+
+tree("Attack")
+	while HasEnemy
+		fallback
+			repeat
+				sequence
+					IsTargetInAttackRange
+					AttackTarget(1.5)
+			repeat
+				sequence
+					tree("ChaseTarget")
+
+tree("ChaseTarget")
+	while
+		sequence
+			not IsTargetInAttackRange
+		repeat
+			sequence
+					SetDestination_Enemy
+				parallel
+					LookAtDestination
+					MoveToDestination

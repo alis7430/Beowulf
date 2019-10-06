@@ -5,19 +5,28 @@ using UnityEngine;
 //-----------------------------------------------------------
 //Scripts\BaseCharacter.cs
 //
-//캐릭터 스탯 데이터를 저장하는 클래스
+// 캐릭터 스탯 데이터를 저장하는 클래스
+// 이벤트를 사용하기 위해 OnEvent를 상속할 수 있다.
 //-----------------------------------------------------------
-public class BaseCharacter
+public class BaseCharacter : MonoBehaviour
 {
     #region Status value(캐릭터 스텟)
 
+    [SerializeField]
     private string name;        // 이름
+    [SerializeField]
     private string description; // 캐릭터 설명
-    private float strength;     // 힘
-    private float defense;      // 방어력
-    private float dexterity;    // 민첩성
-    private float intelligence; // 지능
-    private float health;       // 체력
+    [SerializeField]
+    private int health;       // 체력
+    [SerializeField]
+    private int strength;     // 힘
+    [SerializeField]
+    private int defense;      // 방어력
+    [SerializeField]
+    private int dexterity;    // 민첩성
+    [SerializeField]
+    private int intelligence; // 지능
+
 
     public string NAME
     {
@@ -29,32 +38,35 @@ public class BaseCharacter
         get { return this.description; }
         set { this.description = value; }
     }
-    public float STRENGTH
+    public int STRENGTH
     {
         get { return this.strength; }
         set { this.strength = value; }
     }
-    public float DEFENSE
+    public int DEFENSE
     {
         get { return this.defense; }
         set { this.defense = value; }
     }
-    public float DEXTERITY
+    public int DEXTERITY
     {
         get { return this.dexterity; }
         set { this.dexterity = value; }
     }
-    public float INTELLIGENCE
+    public int INTELLIGENCE
     {
         get { return this.intelligence; }
         set { this.intelligence = value; }
     }
-    public float HEALTH
+    public int HEALTH
     {
         get { return this.health; }
-        set { this.health = value; }
+        set{ this.health = value; }
     }
-
+    #endregion
+    
+    //-----------------------------------------------------------
+    // BaseCharacter에 데이터가 없으면 참조가 불가능하므로 생성자를 이용해 초기화 시켜준다.
     public BaseCharacter()
     {
         NAME = "no data";
@@ -65,8 +77,64 @@ public class BaseCharacter
         INTELLIGENCE = 0;
         HEALTH = 0;
     }
+    //-----------------------------------------------------------
+    private void Start()
+    {
+        Initialize();
+    }
+    #region methods
+    //-----------------------------------------------------------
+    // Use this for initialization
+    protected virtual void Initialize()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.TAKE_DAMAGE, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.DEAD, OnEvent);
+    }
+    //-------------------------------------------------------
+    //Called when events happen
+    protected virtual void OnEvent(EVENT_TYPE Event_Type, Component Sender, object Param = null)
+    {
+        switch (Event_Type)
+        {
+            case EVENT_TYPE.TAKE_DAMAGE:
+                OnTakeDamage(Sender, (int)Param);
+                break;
+            case EVENT_TYPE.DEAD:
+                OnDead(Sender, (int)Param);
+                break;
+            default:
+                break;
+        }
+    }
+    //-------------------------------------------------------
+    //공격할때 호출
+    protected virtual void OnAttackEnemy(Component enemy, int damage)
+    {
+        
+    }
 
+    //-------------------------------------------------------
+    //데미지를 입었을 때 호출
+    protected virtual void OnTakeDamage(Component enemy, int damage)
+    {
+        if (this.GetInstanceID() != enemy.GetInstanceID()) return;
 
+        HEALTH -= damage;
+
+        Debug.Log(string.Format("체력 : {0}", HEALTH));
+
+        if (HEALTH <= 0)
+        {
+            EventManager.Instance.PostNotification(EVENT_TYPE.DEAD, this, health);
+        }
+    }
+
+    //-------------------------------------------------------
+    //체력이 0이 되었을 때 호출
+    protected virtual void OnDead(Component self, int health)
+    {
+
+    }
+    //-------------------------------------------------------
     #endregion
-
 }

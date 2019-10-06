@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
 //-----------------------------------------------------------
 // Scripts\PlayerController.cs
 //
 // 플레이어의 상태 및 움직임을 관리하는 클래스
-// 전체적으로 FSM을 이용하여 캐릭터의 움직임과 상태를 제어한다.
+// 1. 전체적으로 FSM을 이용하여 캐릭터의 움직임과 상태를 제어한다.
+// 2. BaseCharacter를 상속받아 이벤트를 사용
 //-----------------------------------------------------------
-public class PlayerController : MonoBehaviour
+public class PlayerController : BaseCharacter
 {
-    BaseCharacter stats;
+    #region C# properties
+    #endregion
 
     #region variables
 
@@ -32,49 +32,73 @@ public class PlayerController : MonoBehaviour
         DIE,
         NUM_OF_STATES
     }
+
     //-----------------------------------------------------------
-    // 플레이어 데이터 전역변수
-    public static float runSpeed = 2.5f;            // 달리는 속도
-    public static float jumpSpeed = 4.0f;           // 점프 속도
-    public static float attackSpeedRatio = 1.0f;    // 공격속도
-    public static float gravity = 9.8f;             // 중력 크기
-    public static float mouseSensitivity = 2.0f;    // 카메라 마우스 감도
-    public static float cameraHeight = 1.75f;       // 카메라 높이
-
-
-    public GameObject battleAxe;    // 플레이어 무기
-
     // 플레이어 상태 및 상태 타이머 변수
     public STEP step = STEP.NONE;        // 현재 상태
     public STEP next_step = STEP.NONE;   // 다음 상태
     public float stepTimer = 0.0f;
 
-    [SerializeField]
-    float currentSpeed = 0.0f;      // 현재 속도
-    [SerializeField]
-    float curretMoveIncreaseRatio = 1.0f;         // 현재 이동 속도 비율 증/감소 
-    float tempMoveIncreaseRatio = 1.0f;           // 이동 속도 비율 증/감소 임시저장
+
+    //-----------------------------------------------------------
+    // 클래스 참조 변수
+    public GameObject battleAxe;    // 플레이어 무기
 
     Transform modelTransform;       // 플레이어 모델의 트랜스폼    
     CharacterController cc;         // 캐릭터 컨트롤러 컴포넌트
     Animator ani;                   // 애니메이터를 저장
 
-    Vector3 mouseMove;              // 마우스 움직임을 저장
-    Vector3 move;                   // 플레이어의 이동 벡터
+    //-----------------------------------------------------------
+    // 플레이어 데이터 전역변수
 
+    public static float gravity = 9.8f;             // 중력 크기
+    public static float mouseSensitivity = 2.0f;    // 카메라 마우스 감도
+    public static float cameraHeight = 0.5f;        // 카메라 높이
+
+
+    public static float aniSpped = 1.2f;            // 애니메이션 속도
+
+    //-----------------------------------------------------------
+    // 플레이어 움직임 관련 변수
+
+    [HideInInspector]
+    public float runSpeed = 2.5f;            // 달리는 속도
+    [HideInInspector]
+    public float jumpSpeed = 4.0f;           // 점프 속도
+
+    private float attackSpeedRatio;         // 공격속도
+    private float movingSpeedRatio;         // 움직임 속도 비율
+
+    Vector3 move;                             // 플레이어의 이동 벡터
+
+    //-----------------------------------------------------------
+   
+    [SerializeField]
+    float currentSpeed = 0.0f;              // 현재 속도
+    [SerializeField]
+    float curretMoveIncreaseRatio;         // 현재 이동 속도 비율 증/감소 
+    float tempMoveIncreaseRatio;           // 이동 속도 비율 증/감소 임시저장
+
+
+    //-----------------------------------------------------------
+    // 카메라 컨트롤 변수
     Transform cameraParentTransform;    // 카메라의 부모 트랜스폼
     Transform cameraTransform;          // 메인 카메라의 트랜스폼
 
+    Vector3 mouseMove;                  // 마우스 움직임을 저장
 
+    //-----------------------------------------------------------
+    // 상태 체크 변수
     bool is_Player_Armed = false;
     bool is_Gradient_Check = true;
     bool is_Calculate_Move = true;
-    #endregion
     //-----------------------------------------------------------
+    #endregion
 
     #region methods
+    //-----------------------------------------------------------
     // Use this for initialization
-    void Awake()
+    protected override void Initialize()
     {
         // 컴포넌트 클래스 초기화
         cc = GetComponent<CharacterController>();
@@ -84,15 +108,20 @@ public class PlayerController : MonoBehaviour
         // 3인칭 카메라 클래스 초기화
         cameraTransform = Camera.main.transform;
         cameraParentTransform = cameraTransform.parent;
-    }
 
-    private void Start()
-    {
+        // 상태 초기화
         this.step = STEP.NONE;
         this.next_step = STEP.IDLE;
 
+        // 이동속도 증감 비율 초기화
         curretMoveIncreaseRatio = 1.0f;
         tempMoveIncreaseRatio = 1.0f;
+
+        ani.speed = aniSpped;
+
+        movingSpeedRatio = 1 / aniSpped;
+        attackSpeedRatio = 1 / aniSpped;
+
 
         battleAxe.SetActive(false);
     }
@@ -128,7 +157,6 @@ public class PlayerController : MonoBehaviour
                         if (is_Player_Armed)
                             next_step = STEP.BLOCKING; 
                     }
-
                     if (Input.GetKeyDown(KeyCode.X))
                     {
                         next_step = STEP.WEAPON_CHANGE;
@@ -145,14 +173,14 @@ public class PlayerController : MonoBehaviour
                     }
                     break;
                 case STEP.JUMP:
-                    if (stepTimer > 0.7f && cc.isGrounded)  // 점프 애니메이션 때문에 0.7초 이후에 상태 변환
+                    if (stepTimer > 0.7f * movingSpeedRatio && cc.isGrounded)  // 점프 애니메이션 때문에 0.7초 이후에 상태 변환
                     {
                         next_step = STEP.IDLE;
                         curretMoveIncreaseRatio = tempMoveIncreaseRatio;
                     }
                     break;
                 case STEP.WEAPON_CHANGE:
-                    if(stepTimer > 1.1f)    // 무기교체 애니메이션 때문에 1.1초 이후에 상태 변환
+                    if(stepTimer > 1.1f * movingSpeedRatio)    // 무기교체 애니메이션 때문에 1.1초 이후에 상태 변환
                     {
                         next_step = STEP.IDLE;
                     }
@@ -163,7 +191,7 @@ public class PlayerController : MonoBehaviour
                     {
                         next_step = STEP.ATTACK2;
                     }
-                    if(stepTimer > 1.2f)
+                    if(stepTimer > 1.2f * attackSpeedRatio)
                     {
                         next_step = STEP.IDLE;
                         ani.SetInteger("Attack", 0);
@@ -174,7 +202,7 @@ public class PlayerController : MonoBehaviour
                     {
                         next_step = STEP.ATTACK3;
                     }
-                    if (stepTimer > 0.8f)
+                    if (stepTimer > 0.8f * attackSpeedRatio)
                     {
                         next_step = STEP.IDLE;
                         ani.SetInteger("Attack", 0);
@@ -269,13 +297,13 @@ public class PlayerController : MonoBehaviour
                 break;
             case STEP.JUMP:
                 ani.SetFloat("Speed", currentSpeed);
-                if (stepTimer >= 0.45f)
+                if (stepTimer >= 0.45f * movingSpeedRatio)
                 {
                     StartJump();
                 }
                 break;
             case STEP.WEAPON_CHANGE:
-                if(!is_Player_Armed && stepTimer >= 0.6f)
+                if(!is_Player_Armed && stepTimer >= 0.6f * movingSpeedRatio)
                 {
 
                     battleAxe.SetActive(false);

@@ -12,7 +12,8 @@ public enum EVENT_TYPE
     NONE,
     GAME_INIT,
     GAME_END,
-    HEALTH_CHANGE,
+    TAKE_DAMAGE,
+    PLAYER_HIT,
     DEAD,
     NUM_OF_EVENTS
 };
@@ -25,19 +26,13 @@ public class EventManager : MonoBehaviour
     {
         get
         {
-            // 인스턴스가 없는 경우에 접근하려 하면 인스턴스를 할당해준다.
-            if (!_instance)
-            {
-                _instance = FindObjectOfType(typeof(EventManager)) as EventManager;
-
-                if (_instance == null)
-                    Debug.Log("no EventManager obj");
-            }
             return _instance;
         }
+        set { }
     }
     #endregion
-    #region C# properties
+
+    #region variables
     // 싱글톤 패턴을 사용하기 위한 인스턴스 변수
     private static EventManager _instance;
 

@@ -25,6 +25,8 @@ public class Perspective : Sense
     public LayerMask obstacleMask;
 
     Ray ray;
+
+    bool is_player_visible = false;
     //-----------------------------------------------------------
     #endregion
 
@@ -51,9 +53,17 @@ public class Perspective : Sense
     }
 
     //-----------------------------------------------------------
+    public bool IsPlayerVisible()
+    {
+        return is_player_visible;
+    }
+
+    //-----------------------------------------------------------
     //인공지능 캐릭터를 위한 시각 감시
     void DetectAspect()
     {
+        is_player_visible = false;
+
         RaycastHit hit;
 
         //현재 위치에서 플레이어 위치로의 방향
@@ -66,13 +76,13 @@ public class Perspective : Sense
             if (Physics.Raycast(transform.position, rayDirection.normalized, out hit, ViewDistance))
             {
                 Aspect aspect = hit.collider.GetComponent<Aspect>();
-                
+
                 if (aspect != null)
                 {
                     //찾는 종류인지 검사한다
                     if (aspect.aspectName == Aspect.aspect.PLAYER)
                     {
-                        Debug.Log("Detected!");
+                        is_player_visible = true;
                     }
                 }
             }
@@ -97,12 +107,14 @@ public class Perspective : Sense
         Debug.DrawLine(transform.position, rightRayPoint, Color.green);
     }
     //-----------------------------------------------------------
+    // Degree 각을 radian으로 변환
     private Vector3 TransDegreeToZAxis(float angleInDegrees)
     {
         float radian = (angleInDegrees + transform.eulerAngles.y) * Mathf.Deg2Rad;
 
         return new Vector3(Mathf.Sin(radian), 0f, Mathf.Cos(radian));
     }
+    //-----------------------------------------------------------
 
     #endregion
 }
