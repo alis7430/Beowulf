@@ -1,14 +1,24 @@
 tree("Root")
 	parallel
+		repeat mute tree("Die")
 		repeat mute tree("BeAlive")
-		//repeat mute tree("Die")
+		
 
 tree("BeAlive")
-	fallback
-		//tree("ReturnToPlace")
-		tree("Attack")
-		tree("LookTarget")
-		tree("Patroll")
+	sequence
+			not IsDead
+		fallback
+			tree("Attacked")
+			//tree("ReturnToPlace")
+			tree("Attack")
+			tree("LookTarget")
+			tree("Patroll")
+
+tree("Attacked")
+	while IsAttacked
+		repeat
+			sequence
+				AttackedImpact
 
 tree("ReturnToPlace")
 	while IsOutOfBounds
@@ -24,7 +34,7 @@ tree("LookTarget")
 		sequence
 			IsVisibleTarget
 			not HasEnemy
-
+			not IsAttacked
 		repeat
 			sequence
 				SetDestination_Enemy
@@ -37,6 +47,7 @@ tree("Patroll")
 		sequence
 			not HasEnemy
 			not IsVisibleTarget
+			not IsAttacked
 
 		repeat
 			sequence
@@ -47,12 +58,16 @@ tree("Patroll")
 					Idle(4.0)
 
 tree("Attack")
-	while HasEnemy
+	while 
+		sequence
+			HasEnemy
+			not IsAttacked
 		fallback
 			repeat
 				sequence
 					IsTargetInAttackRange
 					AttackTarget(1.5)
+					WaitIdle(1.0)
 			repeat
 				sequence
 					tree("ChaseTarget")
@@ -67,3 +82,12 @@ tree("ChaseTarget")
 				parallel
 					LookAtDestination
 					MoveToDestination
+
+tree("Die")
+	sequence
+		IsDead
+		DeadAndDestroy(4.0)
+			
+	
+
+	

@@ -87,7 +87,6 @@ public class BaseCharacter : MonoBehaviour
     // Use this for initialization
     protected virtual void Initialize()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.TAKE_DAMAGE, OnEvent);
         EventManager.Instance.AddListener(EVENT_TYPE.DEAD, OnEvent);
     }
     //-------------------------------------------------------
@@ -96,42 +95,35 @@ public class BaseCharacter : MonoBehaviour
     {
         switch (Event_Type)
         {
-            case EVENT_TYPE.TAKE_DAMAGE:
-                OnTakeDamage(Sender, (int)Param);
-                break;
             case EVENT_TYPE.DEAD:
-                OnDead(Sender, (int)Param);
+                //OnDead(Sender, (int)Param);
                 break;
             default:
                 break;
         }
     }
-    //-------------------------------------------------------
-    //공격할때 호출
-    protected virtual void OnAttackEnemy(Component enemy, int damage)
-    {
-        
-    }
 
     //-------------------------------------------------------
     //데미지를 입었을 때 호출
-    protected virtual void OnTakeDamage(Component enemy, int damage)
+    protected virtual void OnAttacked(object param)
     {
-        if (this.GetInstanceID() != enemy.GetInstanceID()) return;
+        int damage = (int)param;
 
+        if (damage < 0)
+            return;
         HEALTH -= damage;
 
         Debug.Log(string.Format("체력 : {0}", HEALTH));
 
         if (HEALTH <= 0)
         {
-            EventManager.Instance.PostNotification(EVENT_TYPE.DEAD, this, health);
+            OnDead();
         }
     }
 
     //-------------------------------------------------------
     //체력이 0이 되었을 때 호출
-    protected virtual void OnDead(Component self, int health)
+    protected virtual void OnDead()
     {
 
     }

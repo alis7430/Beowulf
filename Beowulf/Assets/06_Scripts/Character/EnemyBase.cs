@@ -18,7 +18,7 @@ public class EnemyBase : BaseCharacter
     // Enemy의 행동로직에 필요한 변수들
     [HideInInspector]
     public float elapsedTime;
-    
+
     public Transform spawnTransform;            // Spawner 오브젝트으 트랜스폼
     public Transform targetTransform;           // Player의 트랜스폼 참조
     private Transform modelTransform;           // 해당 스크립트의 모델 트랜스폼
@@ -26,14 +26,15 @@ public class EnemyBase : BaseCharacter
     private Animator ani;
 
     public Vector3 destination;                 // 이동하고자 하는 방향
-    
+
     public float moveSpeed;                     // 움직임 속도
     public float rotateSpeed;                   // 회전 속도
-    
+
     private Perspective perspective;            // 시각 센서
 
     private bool hasEnemy = false;              // (공격하고자 하는) 적이 있는가
     private bool isOutOfBounds = false;         // 제한된 이동범위를 벗어났는가
+    private bool is_attacked = false;           // 공격을 받았는가
     #endregion
 
     #region methods
@@ -55,7 +56,7 @@ public class EnemyBase : BaseCharacter
     // Update per frame
     private void Update()
     {
-        
+
     }
 
     //-------------------------------------------------------
@@ -83,9 +84,31 @@ public class EnemyBase : BaseCharacter
         }
     }
     //-------------------------------------------------------
+    //Called when attacked by player
+    protected override void OnAttacked(object param)
+    {
+        base.OnAttacked(param);
+
+        ani.Play("Sword And Shield Impact");
+
+        is_attacked = true;
+    }
+    //-------------------------------------------------------
     #endregion
 
     #region tasks
+    //-------------------------------------------------------
+    [Task]
+    bool IsDead()
+    {
+        return HEALTH <= 0;
+    }
+    //-------------------------------------------------------
+    [Task]
+    bool IsAttacked()
+    {
+        return is_attacked;
+    }
     //-------------------------------------------------------
     [Task]
     bool IsVisibleTarget()
@@ -140,7 +163,7 @@ public class EnemyBase : BaseCharacter
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
                rotateSpeed * Time.deltaTime);
 
-            if(Vector3.Angle(targetDir, this.transform.forward) < 0.05f)
+            if (Vector3.Angle(targetDir, this.transform.forward) < 0.05f)
             {
                 Task.current.Succeed();
             }
@@ -160,15 +183,15 @@ public class EnemyBase : BaseCharacter
     void IsTargetThreaten(float duration)
     {
 
-        if(Task.current.isStarting)
+        if (Task.current.isStarting)
         {
             elapsedTime = -Time.deltaTime;
         }
 
-        ani.Play("Talking"); 
+        ani.Play("Talking");
 
         elapsedTime += Time.deltaTime;
-        
+
         var t = duration - elapsedTime;
 
         if (Task.isInspected)
@@ -217,7 +240,7 @@ public class EnemyBase : BaseCharacter
     {
         if (targetTransform != null)
         {
-            SetDestination(targetTransform.position + new Vector3 (0, -1.0f, 0));
+            SetDestination(targetTransform.position + new Vector3(0, -1.0f, 0));
             return true;
         }
         else
@@ -306,8 +329,61 @@ public class EnemyBase : BaseCharacter
     }
 
     //-------------------------------------------------------
+    [Task]
+    void WaitIdle(float duration)
+    {
+        if (Task.current.isStarting)
+        {
+            elapsedTime = -Time.deltaTime;
+        }
+
+        ani.Play("Sword And Shield Wait");
+
+        elapsedTime += Time.deltaTime;
+
+        var t = duration - elapsedTime;
+        if (Task.isInspected)
+            Task.current.debugInfo = string.Format("t={0:0.00}", t);
+
+        if (t <= 0)
+        {
+            Task.current.Succeed();
+        }
+    }
+    //-------------------------------------------------------
+    [Task]
+    void AttackedImpact()
+    {
+
+        if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Sword And Shield Impact"))
+        {
+            is_attacked = false;
+            Task.current.Succeed();
+        }
+    }
+    //-------------------------------------------------------
+    [Task]
+    void DeadAndDestroy(float duration)
+    {
+        if (Task.current.isStarting)
+        {
+            elapsedTime = -Time.deltaTime;
+            ani.Play("Sword And Shield Death");
+        }
+       
+        elapsedTime += Time.deltaTime;
+
+        var t = duration - elapsedTime;
+        if (Task.isInspected)
+            Task.current.debugInfo = string.Format("t={0:0.00}", t);
+
+        if (t <= 0)
+        {
+            Task.current.Succeed();
+            DestroyImmediate(this.gameObject);
+        }
+    }
+
     #endregion
-
 }
-
 

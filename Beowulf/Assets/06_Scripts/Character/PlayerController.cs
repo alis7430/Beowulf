@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,6 +24,8 @@ public class PlayerController : BaseCharacter
         IDLE = 0,
         MOVE,
         JUMP,
+        JUMP_RUNNING,
+        LANDING,
         WEAPON_CHANGE,
         ATTACK1,
         ATTACK2,
@@ -43,6 +45,7 @@ public class PlayerController : BaseCharacter
     //-----------------------------------------------------------
     // 클래스 참조 변수
     public GameObject battleAxe;    // 플레이어 무기
+    BoxCollider battleAxeCollider;
 
     Transform modelTransform;       // 플레이어 모델의 트랜스폼    
     CharacterController cc;         // 캐릭터 컨트롤러 컴포넌트
@@ -122,8 +125,9 @@ public class PlayerController : BaseCharacter
         movingSpeedRatio = 1 / aniSpped;
         attackSpeedRatio = 1 / aniSpped;
 
-
+        battleAxeCollider = transform.GetChild(0).GetChild(9).GetComponent<BoxCollider>();
         battleAxe.SetActive(false);
+        battleAxeCollider.enabled = false;
     }
     //-----------------------------------------------------------
     // Update문에서 플레이어 상태 검사 및 동작 수행
@@ -175,8 +179,22 @@ public class PlayerController : BaseCharacter
                 case STEP.JUMP:
                     if (stepTimer > 0.7f * movingSpeedRatio && cc.isGrounded)  // 점프 애니메이션 때문에 0.7초 이후에 상태 변환
                     {
+                        if (ani.GetCurrentAnimatorStateInfo(0).IsName("Unarmed Jump Running"))
+                        {
+                            next_step = STEP.MOVE;
+                        }
+                        else
+                        {
+                            next_step = STEP.LANDING;
+                            curretMoveIncreaseRatio = tempMoveIncreaseRatio;
+                        }
+                    }
+                    break;
+                case STEP.LANDING:
+                    if(stepTimer > 0.6f * movingSpeedRatio)
+                    {
                         next_step = STEP.IDLE;
-                        curretMoveIncreaseRatio = tempMoveIncreaseRatio;
+                        is_Calculate_Move = true;
                     }
                     break;
                 case STEP.WEAPON_CHANGE:
@@ -186,38 +204,38 @@ public class PlayerController : BaseCharacter
                     }
                     break;
                 case STEP.ATTACK1:
-                    ani.Play("Standing Melee Combo Attack1");
                     if (Input.GetMouseButtonDown(0) && stepTimer < attackSpeedRatio * 1.3f && stepTimer > attackSpeedRatio * 0.9f)
                     {
+                        battleAxeCollider.enabled = false;
                         next_step = STEP.ATTACK2;
                     }
                     if(stepTimer > 1.2f * attackSpeedRatio)
                     {
+                        battleAxeCollider.enabled = false;
                         next_step = STEP.IDLE;
-                        ani.SetInteger("Attack", 0);
                     }
                     break;
                 case STEP.ATTACK2:
                     if (Input.GetMouseButtonDown(0) && stepTimer < attackSpeedRatio* 0.9f && stepTimer > attackSpeedRatio * 0.5f)
                     {
+                        battleAxeCollider.enabled = false;
                         next_step = STEP.ATTACK3;
                     }
                     if (stepTimer > 0.8f * attackSpeedRatio)
                     {
                         next_step = STEP.IDLE;
-                        ani.SetInteger("Attack", 0);
                     }
                     break;
                 case STEP.ATTACK3:
-                    if (stepTimer > 1.5f * attackSpeedRatio)
+                    if (stepTimer > 1.6f * attackSpeedRatio)
                     {
                         next_step = STEP.IDLE;
-                        ani.SetInteger("Attack", 0);
                     }
                     break;
                 case STEP.BLOCKING:
                     if(Input.GetMouseButtonUp(1))
                     {
+                        ani.SetBool("Blocking", false);
                         next_step = STEP.IDLE;
                     }
                     break;
@@ -235,47 +253,53 @@ public class PlayerController : BaseCharacter
                 case STEP.IDLE:
                     is_Gradient_Check = true;       // 기본 상태에서는 경사로 검색을 해줌
                     is_Calculate_Move = true;       // 기본 상태에서는 이동이 가능
-                    ani.SetBool("isJump", false);
-                    ani.SetBool("Blocking", false);
+                    battleAxeCollider.enabled = false;
                     break;
                 case STEP.MOVE:
                     break;
-                case STEP.JUMP:
-                    ani.Rebind();                   // 실행중이던 착지 애니메이션 때문에 애니메이터 초기화
+                case STEP.JUMP:                
                     is_Gradient_Check = false;      // 점프 중에는 경사로 탐색을 안함
-                    ani.SetBool("isJump", true);
+                    
                     if (currentSpeed < 2.5)
                     {
                         tempMoveIncreaseRatio = curretMoveIncreaseRatio;    // 원래 이동 속도 증가 비율을 저장해 둔다
                         curretMoveIncreaseRatio *= 0.02f;                   // 점프 시 이동 속도 증가 비율 감소
+                        ani.Play("Unarmed Jump");
                     }
+                    else
+                    {
+                        ani.Play("Unarmed Jump Running");
+                    }
+                    break;
+                case STEP.LANDING:
+                    is_Calculate_Move = false;
+                    ani.Play("Unarmed Jump_2");
                     break;
                 case STEP.WEAPON_CHANGE:
                     is_Calculate_Move = false;
                     if (!is_Player_Armed)
                     {
                         is_Player_Armed = true;
-                        ani.SetBool("EquipWeapon", true);
+                        ani.Play("Unarmed Equip Underarm");
                         battleAxe.SetActive(true);
                     }
                     else
                     {
                         is_Player_Armed = false;
-                        ani.SetBool("EquipWeapon", false);
+                        ani.Play("Standing Disarm Underarm");
                     }
-
                     break;
                 case STEP.ATTACK1:
                     is_Calculate_Move = false;
-                    ani.SetInteger("Attack", 1);
+                    ani.Play("Standing Melee Combo Attack1");
                     break;
                 case STEP.ATTACK2:
                     is_Calculate_Move = false;
-                    ani.SetInteger("Attack", 2);
+                    ani.Play("Standing Melee Combo Attack2");
                     break;
                 case STEP.ATTACK3:
                     is_Calculate_Move = false;
-                    ani.SetInteger("Attack", 3);
+                    ani.Play("Standing Melee Combo Attack3");
                     break;
                 case STEP.BLOCKING:
                     ani.SetBool("Blocking", true);
@@ -290,13 +314,40 @@ public class PlayerController : BaseCharacter
         switch (this.step)
         {
             case STEP.IDLE:
-                ani.SetFloat("Speed", currentSpeed);
+                if (!is_Player_Armed)
+                {
+                    ani.Play("Unarmed Idle");
+                }
+                else
+                {
+                    ani.Play("Standing Idle");
+                }
                 break;
             case STEP.MOVE:
-                ani.SetFloat("Speed", currentSpeed);
+                if(currentSpeed > 3.0)
+                {
+                    if (!is_Player_Armed)
+                    {
+                        ani.Play("Unarmed Run Forward");
+                    }
+                    else
+                    {
+                        ani.Play("Standing Run Forward");
+                    }
+                }
+                else
+                {
+                    if (!is_Player_Armed)
+                    {
+                        ani.Play("Unarmed Walk Forward");
+                    }
+                    else
+                    {
+                        ani.Play("Standing Walk Forward");
+                    }
+                }
                 break;
             case STEP.JUMP:
-                ani.SetFloat("Speed", currentSpeed);
                 if (stepTimer >= 0.45f * movingSpeedRatio)
                 {
                     StartJump();
@@ -308,8 +359,20 @@ public class PlayerController : BaseCharacter
 
                     battleAxe.SetActive(false);
                 }
-
                 break;
+            case STEP.ATTACK1:
+                if(stepTimer > 0.6 * attackSpeedRatio)
+                    battleAxeCollider.enabled = true;
+                break;
+            case STEP.ATTACK2:
+                if (stepTimer > 0.3 * attackSpeedRatio)
+                    battleAxeCollider.enabled = true;
+                break;
+            case STEP.ATTACK3:
+                if (stepTimer > 0.6 * attackSpeedRatio)
+                    battleAxeCollider.enabled = true;
+                break;
+
         }
     }
     //-----------------------------------------------------------
@@ -322,13 +385,11 @@ public class PlayerController : BaseCharacter
         if (cc.isGrounded)
         {
             GradientCheck();
-            ani.SetBool("isGrounded", true);
             CalculateMove(curretMoveIncreaseRatio);
         }
         // 공중에 떠 있는 경우
         else
         {
-            ani.SetBool("isGrounded", false);
             move.y -= gravity * Time.deltaTime;
             CalculateMove(0.1f);
         }
@@ -358,7 +419,12 @@ public class PlayerController : BaseCharacter
     // ----------------------------------------------------------
     // public Fuctions
     // ----------------------------------------------------------
+    public void CollisionDetected(Weapon weapon, Collider other)
+    {
 
+        if (other.tag == "Enemy")
+            other.gameObject.SendMessage("OnAttacked", 10);
+    }
 
     // ----------------------------------------------------------
     // Private Fuctions
@@ -462,5 +528,6 @@ public class PlayerController : BaseCharacter
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
     }
     //-----------------------------------------------------------
+
     #endregion
 }
