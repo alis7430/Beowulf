@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //-----------------------------------------------------------
-//Scripts\BaseCharacter.cs
+//Scripts\Character\BaseCharacter.cs
 //
 // 캐릭터 스탯 데이터를 저장하는 클래스
 // 이벤트를 사용하기 위해 OnEvent를 상속할 수 있다.
@@ -11,13 +11,17 @@ using UnityEngine;
 public class BaseCharacter : MonoBehaviour
 {
     #region Status value(캐릭터 스텟)
-
+    //-----------------------------------------------------------
     [SerializeField]
     private string name;        // 이름
     [SerializeField]
     private string description; // 캐릭터 설명
     [SerializeField]
     private int health;       // 체력
+    [SerializeField]
+    private int maxHealth;    // 최대 체력
+    [SerializeField]
+    private int damage;
     [SerializeField]
     private int strength;     // 힘
     [SerializeField]
@@ -27,7 +31,7 @@ public class BaseCharacter : MonoBehaviour
     [SerializeField]
     private int intelligence; // 지능
 
-
+    //-----------------------------------------------------------
     public string NAME
     {
         get { return this.name; }
@@ -37,6 +41,11 @@ public class BaseCharacter : MonoBehaviour
     {
         get { return this.description; }
         set { this.description = value; }
+    }
+    public int DAMAGE
+    {
+        get { return this.damage; }
+        set { this.damage = value; }
     }
     public int STRENGTH
     {
@@ -61,22 +70,44 @@ public class BaseCharacter : MonoBehaviour
     public int HEALTH
     {
         get { return this.health; }
-        set{ this.health = value; }
+        set
+        {
+            if (value <= 0)
+                this.health = -1;
+            else
+                this.health = value;
+        }
     }
+    public int MAXHEALTH
+    {
+        get { return this.maxHealth; }
+        set
+        {
+            if (value <= 0)
+                this.maxHealth = 1;
+            else
+                this.maxHealth = value;
+        }
+    }
+    //-----------------------------------------------------------
     #endregion
-    
+
     //-----------------------------------------------------------
     // BaseCharacter에 데이터가 없으면 참조가 불가능하므로 생성자를 이용해 초기화 시켜준다.
-    public BaseCharacter()
-    {
-        NAME = "no data";
-        DESCRIPTION = "no description";
-        STRENGTH = 0;
-        DEFENSE = 0;
-        DEXTERITY = 0;
-        INTELLIGENCE = 0;
-        HEALTH = 0;
-    }
+    //public BaseCharacter()
+    //{
+    //    NAME = "no data";
+    //    DESCRIPTION = "no description";
+
+    //    HEALTH = 0;
+    //    MAXHEALTH = 0;
+    //    DAMAGE = 0;
+
+    //    STRENGTH = 0;
+    //    DEFENSE = 0;
+    //    DEXTERITY = 0;
+    //    INTELLIGENCE = 0;
+    //}
     //-----------------------------------------------------------
     private void Start()
     {
@@ -87,6 +118,7 @@ public class BaseCharacter : MonoBehaviour
     // Use this for initialization
     protected virtual void Initialize()
     {
+        MAXHEALTH = HEALTH;
         EventManager.Instance.AddListener(EVENT_TYPE.DEAD, OnEvent);
     }
     //-------------------------------------------------------
@@ -126,6 +158,14 @@ public class BaseCharacter : MonoBehaviour
     protected virtual void OnDead()
     {
 
+    }
+    //-------------------------------------------------------
+    //공격하는 클래스의 OnTriggerEnter에서 호출한다.
+    public virtual void CollisionDetected(Weapon weapon, Collider other)
+    {
+
+        //if (other.tag == "Enemy")
+           //other.gameObject.SendMessage("OnAttacked", DAMAGE);
     }
     //-------------------------------------------------------
     #endregion

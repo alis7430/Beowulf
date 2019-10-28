@@ -4,7 +4,7 @@ using UnityEngine;
 using Panda;
 
 //-----------------------------------------------------------
-// Scripts\EnemyBase.cs
+// Scripts\Character\EnemyBase.cs
 //
 // 적 캐릭터를 관리하는 클래스
 // 1. Panda BT를 이용한 Behavior Tree로 동작
@@ -17,7 +17,8 @@ public class EnemyBase : BaseCharacter
     //-----------------------------------------------------------
     // Enemy의 행동로직에 필요한 변수들
     [HideInInspector]
-    public float elapsedTime;
+    private float elapsedTime;
+    private float deadDelayTime;
 
     public Transform spawnTransform;            // Spawner 오브젝트으 트랜스폼
     public Transform targetTransform;           // Player의 트랜스폼 참조
@@ -31,6 +32,8 @@ public class EnemyBase : BaseCharacter
     public float rotateSpeed;                   // 회전 속도
 
     private Perspective perspective;            // 시각 센서
+    
+    private BoxCollider weaponCollider;
 
     private bool hasEnemy = false;              // (공격하고자 하는) 적이 있는가
     private bool isOutOfBounds = false;         // 제한된 이동범위를 벗어났는가
@@ -50,6 +53,9 @@ public class EnemyBase : BaseCharacter
         targetTransform = GameObject.FindGameObjectWithTag("Player").transform;
         modelTransform = transform.GetChild(0);
         ani = modelTransform.GetComponent<Animator>();
+        
+        weaponCollider = transform.GetChild(0).GetChild(3).GetComponent<BoxCollider>() as BoxCollider;
+        weaponCollider.enabled = false;
     }
 
     //-----------------------------------------------------------
@@ -83,14 +89,21 @@ public class EnemyBase : BaseCharacter
                 break;
         }
     }
+    // ----------------------------------------------------------
+    // 공격하는 무기의 OnTriggerEnter에서 호출한다.
+    public override void CollisionDetected(Weapon weapon, Collider other)
+    {
+        if (other.tag == "Player")
+            other.gameObject.SendMessage("OnAttacked", DAMAGE);
+    }
     //-------------------------------------------------------
     //Called when attacked by player
     protected override void OnAttacked(object param)
     {
         base.OnAttacked(param);
 
-        ani.Play("Sword And Shield Impact");
-
+        if(!IsDead())
+            ani.Play("Sword And Shield Impact");
         is_attacked = true;
     }
     //-------------------------------------------------------
@@ -133,8 +146,8 @@ public class EnemyBase : BaseCharacter
         //수정필요
         return isOutOfBounds;
     }
-
     //-------------------------------------------------------
+
     // Vector3.Distance로 공격 가능 범위인지 판단
     [Task]
     bool IsTargetInAttackRange()
@@ -246,6 +259,21 @@ public class EnemyBase : BaseCharacter
         else
             return false;
     }
+    //-------------------------------------------------------
+    [Task]
+    void SetDestination_ChaseTarget()
+    {
+        if (targetTransform != null)
+        {
+            SetDestination(targetTransform.position + new Vector3(0, -1.0f, 0));
+            float dist = Vector3.Distance(destination, transform.position);
+
+            if (dist < 1.0f)
+                Task.current.Succeed();
+        }
+        else
+            Task.current.Fail();
+    }
 
     //-------------------------------------------------------
     [Task]
@@ -317,6 +345,13 @@ public class EnemyBase : BaseCharacter
 
         elapsedTime += Time.deltaTime;
 
+
+        if (elapsedTime > 0.5f && elapsedTime < 0.7f)
+            weaponCollider.enabled = true;
+        if (elapsedTime > 0.7f)
+            weaponCollider.enabled = false;
+
+
         var t = AttackSpeed - elapsedTime;
 
         if (Task.isInspected)
@@ -354,9 +389,11 @@ public class EnemyBase : BaseCharacter
     [Task]
     void AttackedImpact()
     {
-
         if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Sword And Shield Impact"))
         {
+            if (!hasEnemy)
+                hasEnemy = true;
+
             is_attacked = false;
             Task.current.Succeed();
         }
@@ -367,13 +404,13 @@ public class EnemyBase : BaseCharacter
     {
         if (Task.current.isStarting)
         {
-            elapsedTime = -Time.deltaTime;
+            deadDelayTime = -Time.deltaTime;
             ani.Play("Sword And Shield Death");
         }
-       
-        elapsedTime += Time.deltaTime;
 
-        var t = duration - elapsedTime;
+        deadDelayTime += Time.deltaTime;
+
+        var t = duration - deadDelayTime;
         if (Task.isInspected)
             Task.current.debugInfo = string.Format("t={0:0.00}", t);
 
@@ -383,7 +420,7 @@ public class EnemyBase : BaseCharacter
             DestroyImmediate(this.gameObject);
         }
     }
-
+    //-------------------------------------------------------
     #endregion
 }
 

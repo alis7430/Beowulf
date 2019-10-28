@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - AttackRange
+  - UICamera
   layers:
   - Default
   - TransparentFX

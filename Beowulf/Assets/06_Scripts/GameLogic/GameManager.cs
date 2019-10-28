@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
 
     public void StartNewGame()
     {
-        SceneManager.LoadScene("02_Tutorial");
+        LoadingSceneManager.LoadScene("02_Tutorial");
     }
 
     public void ExitGame()

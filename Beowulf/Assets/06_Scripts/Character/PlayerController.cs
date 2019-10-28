@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //-----------------------------------------------------------
-// Scripts\PlayerController.cs
+// Scripts\Character\PlayerController.cs
 //
 // 플레이어의 상태 및 움직임을 관리하는 클래스
 // 1. 전체적으로 FSM을 이용하여 캐릭터의 움직임과 상태를 제어한다.
@@ -32,6 +32,7 @@ public class PlayerController : BaseCharacter
         ATTACK3,
         BLOCKING,
         DIE,
+        CONVERSATION,
         NUM_OF_STATES
     }
 
@@ -45,11 +46,11 @@ public class PlayerController : BaseCharacter
     //-----------------------------------------------------------
     // 클래스 참조 변수
     public GameObject battleAxe;    // 플레이어 무기
-    BoxCollider battleAxeCollider;
+    private BoxCollider battleAxeCollider;
 
-    Transform modelTransform;       // 플레이어 모델의 트랜스폼    
-    CharacterController cc;         // 캐릭터 컨트롤러 컴포넌트
-    Animator ani;                   // 애니메이터를 저장
+    private Transform modelTransform;       // 플레이어 모델의 트랜스폼    
+    private CharacterController cc;         // 캐릭터 컨트롤러 컴포넌트
+    private Animator ani;                   // 애니메이터를 저장
 
     //-----------------------------------------------------------
     // 플레이어 데이터 전역변수
@@ -307,6 +308,11 @@ public class PlayerController : BaseCharacter
                     break;
                 case STEP.DIE:
                     break;
+                case STEP.CONVERSATION:
+                    ani.Rebind();
+                    move = Vector3.zero;
+                    is_Calculate_Move = false;
+                    break;
             }
             this.stepTimer = 0.0f;
         }
@@ -419,13 +425,21 @@ public class PlayerController : BaseCharacter
     // ----------------------------------------------------------
     // public Fuctions
     // ----------------------------------------------------------
-    public void CollisionDetected(Weapon weapon, Collider other)
+    // 공격하는 무기의 OnTriggerEnter에서 호출한다.
+    public override void CollisionDetected(Weapon weapon, Collider other)
     {
 
         if (other.tag == "Enemy")
-            other.gameObject.SendMessage("OnAttacked", 10);
+            other.gameObject.SendMessage("OnAttacked", DAMAGE);
     }
+    // ----------------------------------------------------------
+    protected override void OnAttacked(object param)
+    {
+        base.OnAttacked(param);
 
+        EventManager.Instance.PostNotification(EVENT_TYPE.PLAYER_HIT, this, null);
+
+    }
     // ----------------------------------------------------------
     // Private Fuctions
     // ----------------------------------------------------------*/

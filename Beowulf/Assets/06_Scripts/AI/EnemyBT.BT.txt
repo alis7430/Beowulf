@@ -62,6 +62,7 @@ tree("Attack")
 		sequence
 			HasEnemy
 			not IsAttacked
+			not IsDead
 		fallback
 			repeat
 				sequence
@@ -76,12 +77,14 @@ tree("ChaseTarget")
 	while
 		sequence
 			not IsTargetInAttackRange
-		repeat
-			sequence
-					SetDestination_Enemy
-				parallel
-					LookAtDestination
-					MoveToDestination
+		parallel
+			repeat
+				SetDestination_ChaseTarget
+			repeat
+				MoveToDestination
+			repeat
+				LookAtDestination
+					
 
 tree("Die")
 	sequence
