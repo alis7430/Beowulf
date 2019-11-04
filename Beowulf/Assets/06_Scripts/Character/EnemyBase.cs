@@ -79,8 +79,6 @@ public class EnemyBase : BaseCharacter
                 break;
             case EVENT_TYPE.GAME_END:
                 break;
-            case EVENT_TYPE.TAKE_DAMAGE:
-                break;
             case EVENT_TYPE.DEAD:
                 break;
             case EVENT_TYPE.NUM_OF_EVENTS:

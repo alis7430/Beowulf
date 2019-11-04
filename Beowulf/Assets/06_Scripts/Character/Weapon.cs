@@ -11,12 +11,14 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     //-----------------------------------------------------------
-    BaseCharacter bc;
+    //public GameObject weapon;
+
+    public BaseCharacter bc;
 
     //-----------------------------------------------------------
     void Start()
     {
-        bc = transform.parent.parent.GetComponent<BaseCharacter>();
+        bc = GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>();
     }
     //-----------------------------------------------------------
     // Update is called once per frame

@@ -45,8 +45,11 @@ public class PlayerController : BaseCharacter
 
     //-----------------------------------------------------------
     // 클래스 참조 변수
-    public GameObject battleAxe;    // 플레이어 무기
-    private BoxCollider battleAxeCollider;
+    [HideInInspector]
+    public GameObject weaponManager;
+    [HideInInspector]
+    public GameObject weapon;    // 플레이어 무기
+    public BoxCollider weaponCollider;
 
     private Transform modelTransform;       // 플레이어 모델의 트랜스폼    
     private CharacterController cc;         // 캐릭터 컨트롤러 컴포넌트
@@ -125,10 +128,9 @@ public class PlayerController : BaseCharacter
 
         movingSpeedRatio = 1 / aniSpped;
         attackSpeedRatio = 1 / aniSpped;
-
-        battleAxeCollider = transform.GetChild(0).GetChild(9).GetComponent<BoxCollider>();
-        battleAxe.SetActive(false);
-        battleAxeCollider.enabled = false;
+      
+        weaponCollider.enabled = false;
+        weaponManager = GameObject.FindWithTag("WeaponManager") as GameObject;
     }
     //-----------------------------------------------------------
     // Update문에서 플레이어 상태 검사 및 동작 수행
@@ -162,7 +164,7 @@ public class PlayerController : BaseCharacter
                         if (is_Player_Armed)
                             next_step = STEP.BLOCKING; 
                     }
-                    if (Input.GetKeyDown(KeyCode.X))
+                    if (Input.GetKeyDown(KeyCode.X) && GetWeapon())
                     {
                         next_step = STEP.WEAPON_CHANGE;
                     }
@@ -207,19 +209,19 @@ public class PlayerController : BaseCharacter
                 case STEP.ATTACK1:
                     if (Input.GetMouseButtonDown(0) && stepTimer < attackSpeedRatio * 1.3f && stepTimer > attackSpeedRatio * 0.9f)
                     {
-                        battleAxeCollider.enabled = false;
+                        weaponCollider.enabled = false;
                         next_step = STEP.ATTACK2;
                     }
                     if(stepTimer > 1.2f * attackSpeedRatio)
                     {
-                        battleAxeCollider.enabled = false;
+                        weaponCollider.enabled = false;
                         next_step = STEP.IDLE;
                     }
                     break;
                 case STEP.ATTACK2:
                     if (Input.GetMouseButtonDown(0) && stepTimer < attackSpeedRatio* 0.9f && stepTimer > attackSpeedRatio * 0.5f)
                     {
-                        battleAxeCollider.enabled = false;
+                        weaponCollider.enabled = false;
                         next_step = STEP.ATTACK3;
                     }
                     if (stepTimer > 0.8f * attackSpeedRatio)
@@ -254,7 +256,7 @@ public class PlayerController : BaseCharacter
                 case STEP.IDLE:
                     is_Gradient_Check = true;       // 기본 상태에서는 경사로 검색을 해줌
                     is_Calculate_Move = true;       // 기본 상태에서는 이동이 가능
-                    battleAxeCollider.enabled = false;
+                    weaponCollider.enabled = false;
                     break;
                 case STEP.MOVE:
                     break;
@@ -282,7 +284,7 @@ public class PlayerController : BaseCharacter
                     {
                         is_Player_Armed = true;
                         ani.Play("Unarmed Equip Underarm");
-                        battleAxe.SetActive(true);
+                        weapon.SetActive(true);
                     }
                     else
                     {
@@ -363,20 +365,20 @@ public class PlayerController : BaseCharacter
                 if(!is_Player_Armed && stepTimer >= 0.6f * movingSpeedRatio)
                 {
 
-                    battleAxe.SetActive(false);
+                    weapon.SetActive(false);
                 }
                 break;
             case STEP.ATTACK1:
                 if(stepTimer > 0.6 * attackSpeedRatio)
-                    battleAxeCollider.enabled = true;
+                    weaponCollider.enabled = true;
                 break;
             case STEP.ATTACK2:
                 if (stepTimer > 0.3 * attackSpeedRatio)
-                    battleAxeCollider.enabled = true;
+                    weaponCollider.enabled = true;
                 break;
             case STEP.ATTACK3:
                 if (stepTimer > 0.6 * attackSpeedRatio)
-                    battleAxeCollider.enabled = true;
+                    weaponCollider.enabled = true;
                 break;
 
         }
@@ -437,7 +439,7 @@ public class PlayerController : BaseCharacter
     {
         base.OnAttacked(param);
 
-        EventManager.Instance.PostNotification(EVENT_TYPE.PLAYER_HIT, this, null);
+        EventManager.Instance.PostNotification(EVENT_TYPE.UPDATE_UI, this, null);
 
     }
     // ----------------------------------------------------------
@@ -542,6 +544,21 @@ public class PlayerController : BaseCharacter
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
     }
     //-----------------------------------------------------------
+    bool GetWeapon()
+    {
+        if (weaponManager.transform.childCount != 0)
+        {
+            weapon = weaponManager.transform.GetChild(0).gameObject;
+            return true;
+        }
+        else
+            return false;
+    }
 
+    void ActiveWeapon()
+    {
+        if (weapon != null)
+            weapon.SetActive(!weapon.activeSelf);
+    }
     #endregion
 }

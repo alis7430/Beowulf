@@ -60,8 +60,6 @@ public class DialogueManager : MonoBehaviour
         is_running = false;
         ani.SetBool("IsOpen", false);
         pc.next_step = PlayerController.STEP.IDLE;
-
-        Debug.Log("End of Conversation...");
     }
 
     IEnumerator TypeSentence(string sentence)

@@ -21,7 +21,11 @@ public class BaseCharacter : MonoBehaviour
     [SerializeField]
     private int maxHealth;    // 최대 체력
     [SerializeField]
-    private int damage;
+    private int stamina;      // 스태미너
+    [SerializeField]          
+    private int maxStamina;   // 최대 스태미너
+    [SerializeField]
+    private int damage;       // 데미지
     [SerializeField]
     private int strength;     // 힘
     [SerializeField]
@@ -67,13 +71,35 @@ public class BaseCharacter : MonoBehaviour
         get { return this.intelligence; }
         set { this.intelligence = value; }
     }
+    public int STAMINA
+    {
+        get { return this.stamina; }
+        set
+        {
+            if (value <= 0)
+                this.stamina = 0;
+            else
+                this.stamina = value;
+        }
+    }
+    public int MAXSTAMINA
+    {
+        get { return this.maxStamina; }
+        set
+        {
+            if (value <= 0)
+                this.maxStamina = 1;
+            else
+                this.maxStamina = value;
+        }
+    }
     public int HEALTH
     {
         get { return this.health; }
         set
         {
             if (value <= 0)
-                this.health = -1;
+                this.health = 0;
             else
                 this.health = value;
         }

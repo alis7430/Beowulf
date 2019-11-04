@@ -12,9 +12,10 @@ public enum EVENT_TYPE
     NONE,
     GAME_INIT,
     GAME_END,
-    TAKE_DAMAGE,
+    UPDATE_UI,
     PLAYER_HIT,
     DEAD,
+    QUEST_TUTORIAL_GET_ITEM,
     NUM_OF_EVENTS
 };
 public class EventManager : MonoBehaviour
