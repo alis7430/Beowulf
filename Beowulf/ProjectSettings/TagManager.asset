@@ -9,6 +9,13 @@ TagManager:
   - UICamera
   - Item
   - WeaponManager
+  - SlotHolder
+  - UIManager
+  - Status
+  - SceneCurtain
+  - QuestListContent
+  - QuestWindow
+  - MainCanvas
   layers:
   - Default
   - TransparentFX

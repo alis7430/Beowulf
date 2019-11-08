@@ -55,13 +55,26 @@ public class GameManager : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            SoundManager.instance.PlayBGM("Tutorial");
         }
     }
 
     private void Update()
     {
         //if (Input.GetKeyDown(KeyCode.Escape))
-            //ExitGame();
+        //ExitGame();
+
+        if (SceneManager.GetActiveScene().name == "02_Tutorial")
+        {
+            if (Input.GetKeyDown(KeyCode.Y))
+                LoadingSceneManager.LoadScene("03_Stage1");
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                Quest q = new Quest();
+                QuestManager.instance.AddQuestListContents(q);
+                Debug.Log("호출");
+            }
+        }
     }
 
     public void StartNewGame()

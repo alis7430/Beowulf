@@ -10,6 +10,8 @@ using UnityEngine;
 //-----------------------------------------------------------
 public class BaseCharacter : MonoBehaviour
 {
+    public int ID;
+
     #region Status value(캐릭터 스텟)
     //-----------------------------------------------------------
     [SerializeField]
@@ -189,9 +191,6 @@ public class BaseCharacter : MonoBehaviour
     //공격하는 클래스의 OnTriggerEnter에서 호출한다.
     public virtual void CollisionDetected(Weapon weapon, Collider other)
     {
-
-        //if (other.tag == "Enemy")
-           //other.gameObject.SendMessage("OnAttacked", DAMAGE);
     }
     //-------------------------------------------------------
     #endregion

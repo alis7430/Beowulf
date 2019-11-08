@@ -15,6 +15,8 @@ public class DialogueManager : MonoBehaviour
 
     private PlayerController pc;
 
+    public DialogueTrigger currentDialogueTrigger;
+
     public bool is_running;
 
     // Start is called before the first frame update
@@ -22,14 +24,17 @@ public class DialogueManager : MonoBehaviour
     {
         sentences = new Queue<string>();
         is_running = false;
+
         pc = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>() as PlayerController;
     }
 
-    public void StartDialogue(Dialogue dialogue)
+    public void StartDialogue(Dialogue dialogue, DialogueTrigger dialogueTrigger)
     {
         is_running = true;
         ani.SetBool("IsOpen", true);
         pc.next_step = PlayerController.STEP.CONVERSATION;
+
+        currentDialogueTrigger = dialogueTrigger;
 
         NameText.text = dialogue.name;
         sentences.Clear();
@@ -60,6 +65,13 @@ public class DialogueManager : MonoBehaviour
         is_running = false;
         ani.SetBool("IsOpen", false);
         pc.next_step = PlayerController.STEP.IDLE;
+
+        if(currentDialogueTrigger.hasQuest)
+        {
+            currentDialogueTrigger.OpenQuest();
+        }
+
+        currentDialogueTrigger = null;
     }
 
     IEnumerator TypeSentence(string sentence)
@@ -76,7 +88,7 @@ public class DialogueManager : MonoBehaviour
     {
         if(is_running)
         {
-            if(Input.GetKeyDown(KeyCode.Return))
+            if(Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(1))
             {
                 DisplayNextSentence();
             }

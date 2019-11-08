@@ -1,0 +1,34 @@
+tree("Root")
+	parallel
+		repeat mute tree("Die")
+		repeat mute tree("BeAlive")
+
+tree("BeAlive")
+	sequence
+		not IsDead
+		fallback
+			tree("Attacked")
+			tree("LookTarget")
+
+tree("Attacked")
+	while IsAttacked
+		repeat
+			sequence
+				AttackedImpact
+
+tree("LookTarget")
+	while
+		sequence
+			IsVisibleTarget
+			not HasEnemy
+			not IsAttacked
+		repeat
+			sequence
+				SetDestination_Enemy
+				parallel
+					LookAtDestination
+					PlayTalkingAnim
+tree("Die")
+	sequence
+		IsDead
+		DeadAndDestroy(4.0)

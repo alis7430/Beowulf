@@ -15,7 +15,8 @@ public enum EVENT_TYPE
     UPDATE_UI,
     PLAYER_HIT,
     DEAD,
-    QUEST_TUTORIAL_GET_ITEM,
+    GET_ITEM,
+    ENEMY_KILLED,
     NUM_OF_EVENTS
 };
 public class EventManager : MonoBehaviour

@@ -16,6 +16,7 @@ public class EnemyBase : BaseCharacter
     #region variables
     //-----------------------------------------------------------
     // Enemy의 행동로직에 필요한 변수들
+
     [HideInInspector]
     private float elapsedTime;
     private float deadDelayTime;
@@ -100,8 +101,11 @@ public class EnemyBase : BaseCharacter
     {
         base.OnAttacked(param);
 
-        if(!IsDead())
+        if (!IsDead())
+        {
             ani.Play("Sword And Shield Impact");
+            SoundManager.instance.PlaySFX("Damage_s01");
+        }
         is_attacked = true;
     }
     //-------------------------------------------------------
@@ -214,7 +218,12 @@ public class EnemyBase : BaseCharacter
             Task.current.Succeed();
         }
     }
-
+    //-------------------------------------------------------
+    [Task]
+    void PlayTalkingAnim()
+    {
+        ani.Play("Talking");
+    }
     //-------------------------------------------------------
     [Task]
     public bool SetDestination(Vector3 p)
@@ -404,6 +413,8 @@ public class EnemyBase : BaseCharacter
         {
             deadDelayTime = -Time.deltaTime;
             ani.Play("Sword And Shield Death");
+            SoundManager.instance.PlaySFX("EnemyHumanDead");
+            EventManager.Instance.PostNotification(EVENT_TYPE.ENEMY_KILLED, this, this.ID);
         }
 
         deadDelayTime += Time.deltaTime;

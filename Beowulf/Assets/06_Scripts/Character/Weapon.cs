@@ -18,7 +18,6 @@ public class Weapon : MonoBehaviour
     //-----------------------------------------------------------
     void Start()
     {
-        bc = GameObject.FindGameObjectWithTag("Player").GetComponent<BaseCharacter>();
     }
     //-----------------------------------------------------------
     // Update is called once per frame

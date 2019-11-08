@@ -8,6 +8,7 @@ public class DragableUI : MonoBehaviour
 
     public RectTransform parent;
 
+    [HideInInspector]
     public Camera UIcamera;
 
     // Start is called before the first frame update

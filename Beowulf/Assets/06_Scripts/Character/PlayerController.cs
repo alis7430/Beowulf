@@ -63,7 +63,8 @@ public class PlayerController : BaseCharacter
     public static float cameraHeight = 0.5f;        // 카메라 높이
 
 
-    public static float aniSpped = 1.2f;            // 애니메이션 속도
+    public static float aniSpped = 1.2f;            // 애니메이션 속도   
+
 
     //-----------------------------------------------------------
     // 플레이어 움직임 관련 변수
@@ -96,10 +97,16 @@ public class PlayerController : BaseCharacter
 
     //-----------------------------------------------------------
     // 상태 체크 변수
-    bool is_Player_Armed = false;
+    public bool is_Player_Armed = false;
     bool is_Gradient_Check = true;
     bool is_Calculate_Move = true;
+    bool is_CameraMoveOnPlayer = true;
+
+    public bool is_player_Control = true;
     //-----------------------------------------------------------
+    // 퀘스트 시스템 변수
+    //-----------------------------------------------------------
+    public List<Quest> quests;
     #endregion
 
     #region methods
@@ -107,6 +114,8 @@ public class PlayerController : BaseCharacter
     // Use this for initialization
     protected override void Initialize()
     {
+        DontDestroyOnLoad(this.gameObject);
+
         // 컴포넌트 클래스 초기화
         cc = GetComponent<CharacterController>();
         modelTransform = transform.GetChild(0);
@@ -115,6 +124,7 @@ public class PlayerController : BaseCharacter
         // 3인칭 카메라 클래스 초기화
         cameraTransform = Camera.main.transform;
         cameraParentTransform = cameraTransform.parent;
+
 
         // 상태 초기화
         this.step = STEP.NONE;
@@ -129,8 +139,12 @@ public class PlayerController : BaseCharacter
         movingSpeedRatio = 1 / aniSpped;
         attackSpeedRatio = 1 / aniSpped;
       
-        weaponCollider.enabled = false;
         weaponManager = GameObject.FindWithTag("WeaponManager") as GameObject;
+
+        weaponCollider = weaponManager.GetComponent<BoxCollider>();
+        weaponCollider.enabled = false;
+
+        quests = new List<Quest>();
     }
     //-----------------------------------------------------------
     // Update문에서 플레이어 상태 검사 및 동작 수행
@@ -148,7 +162,7 @@ public class PlayerController : BaseCharacter
                     {
                         next_step = STEP.MOVE;
                     }
-                    if (Input.GetKeyDown(KeyCode.Space))
+                    if (Input.GetKeyDown(KeyCode.Space) && cc.isGrounded)
                     {
                         next_step = STEP.JUMP;
                     }
@@ -256,6 +270,8 @@ public class PlayerController : BaseCharacter
                 case STEP.IDLE:
                     is_Gradient_Check = true;       // 기본 상태에서는 경사로 검색을 해줌
                     is_Calculate_Move = true;       // 기본 상태에서는 이동이 가능
+                    is_CameraMoveOnPlayer = true;
+                    is_player_Control = true;
                     weaponCollider.enabled = false;
                     break;
                 case STEP.MOVE:
@@ -295,14 +311,18 @@ public class PlayerController : BaseCharacter
                 case STEP.ATTACK1:
                     is_Calculate_Move = false;
                     ani.Play("Standing Melee Combo Attack1");
+                    SoundManager.instance.PlaySFX("Swing_s01", 0.6f * attackSpeedRatio);
                     break;
                 case STEP.ATTACK2:
                     is_Calculate_Move = false;
                     ani.Play("Standing Melee Combo Attack2");
+                    SoundManager.instance.PlaySFX("Swing_s02", 0.3f * attackSpeedRatio);
                     break;
                 case STEP.ATTACK3:
                     is_Calculate_Move = false;
                     ani.Play("Standing Melee Combo Attack3");
+
+                    SoundManager.instance.PlaySFX("Swing_s03", 0.6f * attackSpeedRatio);
                     break;
                 case STEP.BLOCKING:
                     ani.SetBool("Blocking", true);
@@ -369,16 +389,22 @@ public class PlayerController : BaseCharacter
                 }
                 break;
             case STEP.ATTACK1:
-                if(stepTimer > 0.6 * attackSpeedRatio)
+                if (stepTimer > 0.6f * attackSpeedRatio)
+                {
                     weaponCollider.enabled = true;
+                }
                 break;
             case STEP.ATTACK2:
-                if (stepTimer > 0.3 * attackSpeedRatio)
+                if (stepTimer > 0.3f * attackSpeedRatio)
+                {
                     weaponCollider.enabled = true;
+                }
                 break;
             case STEP.ATTACK3:
-                if (stepTimer > 0.6 * attackSpeedRatio)
+                if (stepTimer > 0.6f * attackSpeedRatio)
+                {
                     weaponCollider.enabled = true;
+                }
                 break;
 
         }
@@ -409,19 +435,22 @@ public class PlayerController : BaseCharacter
     // 카메라 위치 및 로직 처리
     void LateUpdate()
     {
-        cameraParentTransform.position = transform.position + Vector3.up * cameraHeight;  //캐릭터의 머리 높이쯤
+        if (is_CameraMoveOnPlayer)
+        {
+            cameraParentTransform.position = transform.position + Vector3.up * cameraHeight;  //캐릭터의 머리 높이쯤
 
-        mouseMove += new Vector3(-Input.GetAxisRaw("Mouse Y") * mouseSensitivity, Input.GetAxisRaw("Mouse X") * mouseSensitivity, 0);   //마우스의 움직임을 가감
+            mouseMove += new Vector3(-Input.GetAxisRaw("Mouse Y") * mouseSensitivity, Input.GetAxisRaw("Mouse X") * mouseSensitivity, 0);   //마우스의 움직임을 가감
 
-        if (mouseMove.x < -20)  //높이는 제한을 둔다. 슈팅 게임이라면 거의 90에 가깝게 두는게 좋을수도 있다.
-            mouseMove.x = -20;
-        else if (30 < mouseMove.x)
-            mouseMove.x = 30;
+            if (mouseMove.x < -20)  //높이는 제한을 둔다. 슈팅 게임이라면 거의 90에 가깝게 두는게 좋을수도 있다.
+                mouseMove.x = -20;
+            else if (30 < mouseMove.x)
+                mouseMove.x = 30;
 
-        //여기서 헷갈리면 안 되는게 GetAxisRaw("Mouse XY") 는 실제 마우스의 움직임의 x좌표 y좌표를 가져오지만 회전은 축 기준이라 x가 위아래고 y가 좌우이다.
-        cameraParentTransform.localEulerAngles = mouseMove;
+            //여기서 헷갈리면 안 되는게 GetAxisRaw("Mouse XY") 는 실제 마우스의 움직임의 x좌표 y좌표를 가져오지만 회전은 축 기준이라 x가 위아래고 y가 좌우이다.
+            cameraParentTransform.localEulerAngles = mouseMove;
 
-        ControlCameraDistance();
+            ControlCameraDistance();
+        }
     }
 
     // ----------------------------------------------------------
@@ -430,17 +459,51 @@ public class PlayerController : BaseCharacter
     // 공격하는 무기의 OnTriggerEnter에서 호출한다.
     public override void CollisionDetected(Weapon weapon, Collider other)
     {
-
         if (other.tag == "Enemy")
             other.gameObject.SendMessage("OnAttacked", DAMAGE);
+
+        EventManager.Instance.PostNotification(EVENT_TYPE.PLAYER_HIT, this, null);
     }
     // ----------------------------------------------------------
     protected override void OnAttacked(object param)
     {
         base.OnAttacked(param);
-
-        EventManager.Instance.PostNotification(EVENT_TYPE.UPDATE_UI, this, null);
-
+    }
+    //-----------------------------------------------------------
+    public bool GetWeapon()
+    {
+        if (weaponManager.transform.childCount != 0)
+        {
+            weapon = weaponManager.transform.GetChild(0).gameObject;
+            return true;
+        }
+        else
+            return false;
+    }
+    //-----------------------------------------------------------
+    void ActiveWeapon()
+    {
+        if (weapon != null)
+            weapon.SetActive(!weapon.activeSelf);
+    }
+    //-----------------------------------------------------------
+    public void AddQuest(Quest quest)
+    {
+        this.quests.Add(quest);
+    }
+    //-----------------------------------------------------------
+    public bool IsReachedQuest(Quest quest)
+    {
+        if(quest.isActive)
+        {
+            if (quest.goal.IsReached())
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+        return false;
     }
     // ----------------------------------------------------------
     // Private Fuctions
@@ -544,21 +607,6 @@ public class PlayerController : BaseCharacter
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
     }
     //-----------------------------------------------------------
-    bool GetWeapon()
-    {
-        if (weaponManager.transform.childCount != 0)
-        {
-            weapon = weaponManager.transform.GetChild(0).gameObject;
-            return true;
-        }
-        else
-            return false;
-    }
 
-    void ActiveWeapon()
-    {
-        if (weapon != null)
-            weapon.SetActive(!weapon.activeSelf);
-    }
     #endregion
 }
