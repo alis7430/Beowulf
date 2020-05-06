@@ -10,11 +10,17 @@ public class DialogueTrigger : MonoBehaviour
     public int dialogueNumber;
     public bool hasQuest;
 
-    public QuestGiver questGiver;
+    private QuestGiver questGiver;
+    private NPCState npcState;
 
     private void Start()
     {
         dialogueNumber = 0;
+
+        if(this.transform.GetComponent<NPCState>() != null)
+        {
+            npcState = this.transform.GetComponent<NPCState>();
+        }
 
         if (this.transform.GetComponent<QuestGiver>() != null)
         {
@@ -65,6 +71,7 @@ public class DialogueTrigger : MonoBehaviour
 
     public void OpenQuest()
     {
-        questGiver.OpenQuestWindow();
+        if(hasQuest == true)
+            questGiver.OpenQuestWindow();
     }
 }

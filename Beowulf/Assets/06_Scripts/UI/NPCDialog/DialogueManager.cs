@@ -72,6 +72,8 @@ public class DialogueManager : MonoBehaviour
         }
 
         currentDialogueTrigger = null;
+
+        Debug.Log("End Dialogue");
     }
 
     IEnumerator TypeSentence(string sentence)

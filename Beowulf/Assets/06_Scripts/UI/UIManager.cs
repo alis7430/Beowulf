@@ -43,20 +43,6 @@ public class UIManager : MonoBehaviour
     //-----------------------------------------------------------
 
     public Image EquipedWeapon;
-    
-
-    //-----------------------------------------------------------
-    //PlayerInfo
-    //-----------------------------------------------------------
-    public TMP_Text StatusInfo_HP;
-    public TMP_Text StatusInfo_SP;
-    public TMP_Text StatusInfo_ATK;
-    public TMP_Text StatusInfo_DEF;
-    public TMP_Text StatusInfo_STR;
-    public TMP_Text StatusInfo_DEX;
-    public TMP_Text StatusInfo_INT;
-
-    public Image PlayerEquipedWeapon;
 
     //-----------------------------------------------------------
     //Inventory
@@ -97,16 +83,6 @@ public class UIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Transform status = GameObject.FindGameObjectWithTag("Status").transform;
-
-        StatusInfo_HP = status.GetChild(0).GetComponent<TMP_Text>();
-        StatusInfo_SP = status.GetChild(1).GetComponent<TMP_Text>();
-        StatusInfo_ATK = status.GetChild(2).GetComponent<TMP_Text>();
-        StatusInfo_DEF = status.GetChild(3).GetComponent<TMP_Text>();
-        StatusInfo_STR = status.GetChild(4).GetComponent<TMP_Text>();
-        StatusInfo_DEX = status.GetChild(5).GetComponent<TMP_Text>();
-        StatusInfo_INT = status.GetChild(6).GetComponent<TMP_Text>();
-
         pc = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>() as PlayerController;
         EventManager.Instance.AddListener(EVENT_TYPE.PLAYER_HIT, OnEvent);
         EventManager.Instance.AddListener(EVENT_TYPE.UPDATE_UI, OnEvent);
@@ -116,7 +92,7 @@ public class UIManager : MonoBehaviour
         questListWindow.GetComponent<RectTransform>().localPosition = Vector3.zero;
 
         EquipedWeapon.sprite = defaultImage;
-        PlayerEquipedWeapon.sprite = defaultImage;
+        
     }
 
     protected virtual void OnEvent(EVENT_TYPE Event_Type, Component Sender, object Param = null)
@@ -187,21 +163,11 @@ public class UIManager : MonoBehaviour
 
     private void OnUpdateUI()
     {
-        PlayerStatusUpdate();
         ExpAndLevelUpdate();
         goldText.text = Inventory.gold.ToString();
     }
 
-    private void PlayerStatusUpdate()
-    {
-        StatusInfo_HP.text = pc.HEALTH.ToString() + " / " + pc.MAXHEALTH.ToString();
-        StatusInfo_SP.text = pc.STAMINA.ToString() + " / " + pc.MAXSTAMINA.ToString();
-        StatusInfo_ATK.text = pc.DAMAGE.ToString();
-        StatusInfo_DEF.text = pc.DEFENSE.ToString();
-        StatusInfo_STR.text = pc.STRENGTH.ToString();
-        StatusInfo_DEX.text = pc.DEXTERITY.ToString();
-        StatusInfo_INT.text = pc.DEXTERITY.ToString();
-    }
+
     private void ExpAndLevelUpdate()
     {
         LevelText.text = LevelManager.instance.LEVEL.ToString();
@@ -210,7 +176,7 @@ public class UIManager : MonoBehaviour
     public void WeaponImageUpdate(Sprite icon)
     {
         EquipedWeapon.sprite = icon;
-        PlayerEquipedWeapon.sprite = icon;
+        //PlayerEquipedWeapon.sprite = icon;
     }
     public void WeaponImageSetDefalut()
     {

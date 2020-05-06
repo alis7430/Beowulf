@@ -16,6 +16,7 @@ public enum EVENT_TYPE
     PLAYER_HIT,
     DEAD,
     GET_ITEM,
+    EQUIP_ITEM,
     ENEMY_KILLED,
     NUM_OF_EVENTS
 };

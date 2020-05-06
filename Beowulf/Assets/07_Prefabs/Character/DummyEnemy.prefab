@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!65 &8108811805910574262
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4719674342535233601}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3003643, y: 0.09167374, z: 1.0141826}
+  m_Center: {x: 0.061040234, y: -0.0066548, z: 0.30364972}
 --- !u!1 &8108811805872113156
 GameObject:
   m_ObjectHideFlags: 0
@@ -10,7 +23,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8108811805872113179}
   - component: {fileID: 8108811805872113180}
-  - component: {fileID: 8108811805872113181}
   - component: {fileID: 8108811805872113182}
   - component: {fileID: 8108811805872113183}
   - component: {fileID: 8108811805872113176}
@@ -22,7 +34,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8108811805872113179
 Transform:
   m_ObjectHideFlags: 0
@@ -30,7 +42,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8108811805872113156}
-  m_LocalRotation: {x: -0, y: -0.33419934, z: -0, w: 0.94250244}
+  m_LocalRotation: {x: 0, y: -0.33420172, z: 0, w: 0.9425016}
   m_LocalPosition: {x: 0.7150459, y: 2.2614136, z: -11.303171}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -62,20 +74,6 @@ MonoBehaviour:
     breakPointStatuses: 
     collapsedLines: 
     btScript: 
---- !u!136 &8108811805872113181
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8108811805872113156}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!136 &8108811805872113182
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -175,19 +173,6 @@ MonoBehaviour:
   mainCamera: {fileID: 0}
   UIcamera: {fileID: 0}
   target: {fileID: 8108811807461216095}
---- !u!65 &8108811805910574262
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4719674342535233601}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.3003643, y: 0.09167374, z: 1.0141826}
-  m_Center: {x: 0.061040234, y: -0.0066548, z: 0.30364972}
 --- !u!1 &8108811806033514997
 GameObject:
   m_ObjectHideFlags: 0
@@ -408,7 +393,7 @@ RectTransform:
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -0.000030518, y: -29.195}
   m_Pivot: {x: 0.5, y: 0.5}

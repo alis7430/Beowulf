@@ -20,7 +20,9 @@ public class QuestGiver : MonoBehaviour
 
     public int questNumber;
 
-    public DialogueTrigger dialogueTrigger;
+    private NPCState npcState;
+
+    private DialogueTrigger dialogueTrigger;
 
 
     private void Start()
@@ -38,10 +40,15 @@ public class QuestGiver : MonoBehaviour
         questWindow.SetActive(false);
 
         dialogueTrigger = this.transform.GetComponent<DialogueTrigger>();
+        npcState = this.transform.GetComponent<NPCState>();
     }
 
     public void OpenQuestWindow()
     {
+        //진행중인 퀘스트가 있다면 완료시까지 퀘스트 윈도우를 열 필요가 없다.
+        if (npcState.GetState() == NPC_STATE.QUEST_PROGRESSING)
+            return;
+
         for (int i = 0; i < quests.Length; i++)
         {
             // Giver가 가지고있는 퀘스트 중 클리어 하지않은 퀘스트가 있다면
@@ -69,11 +76,13 @@ public class QuestGiver : MonoBehaviour
 
     public void AcceptQuest()
     {
+        //Debug.Log("퀘스트 수락");
         UIManager.Instance.questWindowEnabled = false;
 
         questWindow.SetActive(false);
         quests[questNumber].isActive = true;
         quests[questNumber].questGiver = this;
+
         
         QuestManager.instance.AddCurrentQuest(quests[questNumber]);
         QuestManager.instance.ClearQuestGiver();
@@ -81,6 +90,7 @@ public class QuestGiver : MonoBehaviour
 
     public void RefuseQuest()
     {
+        //Debug.Log("퀘스트 취소");
         UIManager.Instance.questWindowEnabled = false;
         questWindow.SetActive(false);
         QuestManager.instance.ClearQuestGiver();
@@ -90,5 +100,11 @@ public class QuestGiver : MonoBehaviour
     {
         if (dialogueTrigger != null)
             dialogueTrigger.NextDialogueNumber();
+    }
+    
+    public void SetState(NPC_STATE state)
+    {
+        if(npcState != null)
+            npcState.SetState(state);
     }
 }

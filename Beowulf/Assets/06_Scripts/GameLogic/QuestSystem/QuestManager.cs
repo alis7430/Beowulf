@@ -46,21 +46,70 @@ public class QuestManager : MonoBehaviour
         EventManager.Instance.AddListener(EVENT_TYPE.ENEMY_KILLED, OnEvent);
     }
 
-    private void Update()
+    private void CheckQuestStartEvent(int questId)
     {
-
+        switch (questId)
+        {
+            case 101:
+                Vector3 pos = new Vector3(36f, 59f, 40f);
+                InstancingGoalItem(currentQuest[questId].goal.needItem.gameObject, pos);
+                currentQuest[questId].questGiver.NextDialogue();
+                break;
+            case 102:
+                CompleteQuest(currentQuest[questId]);
+                break;
+            case 103:
+                currentQuest[questId].questGiver.NextDialogue();
+                GameObject dummys = GameObject.Find("Dummys");
+                dummys.transform.GetChild(0).gameObject.SetActive(true);
+                dummys.transform.GetChild(1).gameObject.SetActive(true);
+                dummys.transform.GetChild(2).gameObject.SetActive(true);
+                break;
+            case 104:
+                currentQuest[questId].questGiver.NextDialogue();
+                break;
+            default:
+                break;
+        }
     }
 
+    private void CheckQuestCompleteEvent(int questId)
+    {
+        switch (questId)
+        {
+            case 101:
+                currentQuest[questId].questGiver.NextDialogue();
+                break;
+            case 102:
+                currentQuest[questId].questGiver.NextDialogue();
+                break;
+            case 103:
+                currentQuest[questId].questGiver.NextDialogue();
+                break;
+            case 104:
+                break;
+            default:
+                break;
+        }
+    }
     public void AddCurrentQuest(Quest quest)
     {
         if (quest != null)
         {
             currentQuest.Add(quest.ID, quest);
             AddQuestListContents(quest);
+            quest.questGiver.SetState(NPC_STATE.QUEST_PROGRESSING);
             CheckQuestStartEvent(quest.ID);
         }
     }
-
+    public void CompleteQuest(Quest quest)
+    {
+        quest.Complete();
+        GetQuestInfoSlotFromID(quest.ID).Complete();
+        quest.questGiver.SetState(NPC_STATE.CLEARQUEST);
+        CheckQuestCompleteEvent(quest.ID);
+        currentQuest.Remove(quest.ID);
+    }
     public void AcceptQuest()
     {
         if (curQuestGiver != null)
@@ -108,14 +157,6 @@ public class QuestManager : MonoBehaviour
         goalObj.transform.position = pos;
 
     }
-    public void CompleteQuest(Quest quest)
-    {
-        quest.Complete();
-        GetQuestInfoSlotFromID(quest.ID).Complete();
-
-        CheckQuestCompleteEvent(quest.ID);
-        currentQuest.Remove(quest.ID);
-    }
 
     public QuestInfoSlot GetQuestInfoSlotFromID(int questID)
     {
@@ -155,49 +196,7 @@ public class QuestManager : MonoBehaviour
         //못 넣은 퀘스트를 다시 추가한다.
         AddQuestListContents(quest);
     }
-    private void CheckQuestStartEvent(int questId)
-    {
-        switch(questId)
-        {
-            case 101:
-                Vector3 pos = new Vector3(36f, 59f, 40f);
-                InstancingGoalItem(currentQuest[questId].goal.needItem.gameObject, pos);
-                break;
-            case 102:
-                CompleteQuest(currentQuest[questId]);
-                break;
-            case 103:
-                GameObject dummys = GameObject.Find("Dummys");
-                dummys.transform.GetChild(0).gameObject.SetActive(true);
-                dummys.transform.GetChild(1).gameObject.SetActive(true);
-                dummys.transform.GetChild(2).gameObject.SetActive(true);
-                break;
-            case 104:
-                currentQuest[questId].questGiver.NextDialogue();
-                break;
-            default:
-                break;
-        }
-    }
-    private void CheckQuestCompleteEvent(int questId)
-    {
-        switch(questId)
-        {
-            case 101:
-                currentQuest[questId].questGiver.NextDialogue();
-                break;
-            case 102:
-                currentQuest[questId].questGiver.NextDialogue();
-                break;
-            case 103:
-                currentQuest[questId].questGiver.NextDialogue();
-                break;
-            case 104:
-                break;
-            default:
-                break;
-        }
-    }
+
 
     // 아이템을 얻었을 때 퀘스트의 진행 상황을 확인
     private void CheckQuestItem(int itemID)
