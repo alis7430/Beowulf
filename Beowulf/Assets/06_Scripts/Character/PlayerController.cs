@@ -435,6 +435,9 @@ public class PlayerController : BaseCharacter
     // 카메라 위치 및 로직 처리
     void LateUpdate()
     {
+        if (Cursor.lockState != CursorLockMode.Locked)
+            return;
+        
         if (is_CameraMoveOnPlayer)
         {
             cameraParentTransform.position = transform.position + Vector3.up * cameraHeight;  //캐릭터의 머리 높이쯤

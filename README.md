@@ -79,7 +79,7 @@ Beowulf는 중세 시대를 배경으로 한 Unity로 제작한 싱글 액션 RP
 
 | 구성 요소            | 사용 기술 / 설명                             |
 |---------------------|----------------------------------------------|
-| 🎮 게임 엔진         | Unity 2019.1.8f1                             |
+| 🎮 게임 엔진         | Unity 2022.3.62f1                            |
 | 🎨 렌더링 파이프라인 | **Built-in Render Pipeline**                |
 | 🧩 UI 시스템         | Unity UI, TextMesh Pro                       |
 | 🧠 AI 시스템         | Panda Behaviour Tree (외부 플러그인)        |

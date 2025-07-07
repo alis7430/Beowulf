@@ -517,8 +517,8 @@ public class TerrainToolkit : MonoBehaviour {
 		try {
 			
 			TerrainData terData = ter.terrainData;
-			int Tw = terData.heightmapWidth;
-			int Th = terData.heightmapHeight;
+			int Tw = terData.heightmapResolution;
+			int Th = terData.heightmapResolution;
 			Vector3 Ts = terData.size;
 			int Sx = (int) Mathf.Floor((Tw / Ts.x) * brushSize);
 			int Sy = (int) Mathf.Floor((Th / Ts.z) * brushSize);
@@ -584,8 +584,8 @@ public class TerrainToolkit : MonoBehaviour {
 		if( ter==null )	return;
 		try {
 			TerrainData terData = ter.terrainData;
-			int Tw = terData.heightmapWidth;
-			int Th = terData.heightmapHeight;
+			int Tw = terData.heightmapResolution;
+			int Th = terData.heightmapResolution;
 			float[,] heightMap = terData.GetHeights(0, 0, Tw, Th);
 			// Set the number of iterations and pass the height array to the appropriate erosion script...
 			int iterations;
@@ -1672,8 +1672,8 @@ public class TerrainToolkit : MonoBehaviour {
 		
 		textureProgressDelegate("Procedural Terrain Texture", "Generating height and slope maps. Please wait.", 0.1f);
 		
-		int Tw = terData.heightmapWidth - 1;
-		int Th = terData.heightmapHeight - 1;
+		int Tw = terData.heightmapResolution - 1;
+		int Th = terData.heightmapResolution - 1;
 		
 		float[,] heightMapData = new float[Tw, Th];
 		float[,] slopeMapData = new float[Tw, Th];
@@ -1990,8 +1990,8 @@ public class TerrainToolkit : MonoBehaviour {
 		Terrain ter =  gameObject.GetComponent<Terrain>();
 		if( ter==null )	return;
 		TerrainData terData = ter.terrainData;
-		int Tw = terData.heightmapWidth;
-		int Th = terData.heightmapHeight;
+		int Tw = terData.heightmapResolution;
+		int Th = terData.heightmapResolution;
 		float[,] heightMap = terData.GetHeights(0, 0, Tw, Th);
 		float[,] generatedHeightMap = (float[,]) heightMap.Clone();
 		// Set the number of iterations and pass the height array to the appropriate generator script...
@@ -2780,8 +2780,8 @@ public class TerrainToolkit : MonoBehaviour {
 			// Reset splats !
 			terData.splatPrototypes = splatPrototypes;
 			
-			int Tw = terData.heightmapWidth;
-			int Th = terData.heightmapHeight;
+			int Tw = terData.heightmapResolution;
+			int Th = terData.heightmapResolution;
 			
 			float[,] heightMap = terData.GetHeights(0, 0, Tw, Th);
 			
@@ -2819,8 +2819,8 @@ public class TerrainToolkit : MonoBehaviour {
 			
 			TerrainData terData = ter.terrainData;
 			
-			int Tw = terData.heightmapWidth;
-			int Th = terData.heightmapHeight;
+			int Tw = terData.heightmapResolution;
+			int Th = terData.heightmapResolution;
 			float[,] heightMap = terData.GetHeights(0, 0, Tw, Th);
 			
 			int Mw;
@@ -2856,8 +2856,8 @@ public class TerrainToolkit : MonoBehaviour {
 			
 			TerrainData terData = ter.terrainData;
 			
-			int Tw = terData.heightmapWidth;
-			int Th = terData.heightmapHeight;
+			int Tw = terData.heightmapResolution;
+			int Th = terData.heightmapResolution;
 			
 			int hTwLimit = (int) (Tw * amount);
 			int hThLimit = (int) (Th * amount);			

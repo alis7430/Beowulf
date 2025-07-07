@@ -77,7 +77,7 @@ This solo project was developed to gain hands-on experience in building an RPG s
 
 | Component            | Technology / Description                        |
 |----------------------|-------------------------------------------------|
-| 🎮 Game Engine        | Unity 2019.1.8f1                                |
+| 🎮 Game Engine        | Unity 2022.3.62f1                                |
 | 🎨 Render Pipeline    | **Built-in Render Pipeline**                   |
 | 🧩 UI System          | Unity UI, TextMesh Pro                          |
 | 🧠 AI System          | Panda Behaviour Tree (external plugin)         |
