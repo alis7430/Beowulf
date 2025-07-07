@@ -1,0 +1,131 @@
+fileFormatVersion: 2
+guid: b227dbd4c5435604a82acb3c1aebd7dd
+timeCreated: 1501749832
+licenseType: Store
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: MM_Axe_01_01_lod0
+    100002: MM_Axe_01_01_lod1
+    100004: MM_Axe_01_02_lod0
+    100006: MM_Axe_01_02_lod1
+    100008: //RootNode
+    100010: MM_Swords_01_01_lod0
+    100012: MM_Swords_01_01_lod1
+    100014: MM_Swords_01_02_lod0
+    100016: MM_Swords_01_02_lod1
+    100018: MM_Axe_01_01_lod2
+    100020: MM_Axe_01_02_lod2
+    100022: MM_Swords_01_01_lod2
+    100024: MM_Swords_01_02_lod2
+    400000: MM_Axe_01_01_lod0
+    400002: MM_Axe_01_01_lod1
+    400004: MM_Axe_01_02_lod0
+    400006: MM_Axe_01_02_lod1
+    400008: //RootNode
+    400010: MM_Swords_01_01_lod0
+    400012: MM_Swords_01_01_lod1
+    400014: MM_Swords_01_02_lod0
+    400016: MM_Swords_01_02_lod1
+    400018: MM_Axe_01_01_lod2
+    400020: MM_Axe_01_02_lod2
+    400022: MM_Swords_01_01_lod2
+    400024: MM_Swords_01_02_lod2
+    2300000: MM_Axe_01_01_lod0
+    2300002: MM_Axe_01_01_lod1
+    2300004: MM_Axe_01_02_lod0
+    2300006: MM_Axe_01_02_lod1
+    2300008: MM_Swords_01_01_lod0
+    2300010: MM_Swords_01_01_lod1
+    2300012: MM_Swords_01_02_lod0
+    2300014: MM_Swords_01_02_lod1
+    2300016: MM_Axe_01_01_lod2
+    2300018: MM_Axe_01_02_lod2
+    2300020: MM_Swords_01_01_lod2
+    2300022: MM_Swords_01_02_lod2
+    3300000: MM_Axe_01_01_lod0
+    3300002: MM_Axe_01_01_lod1
+    3300004: MM_Axe_01_02_lod0
+    3300006: MM_Axe_01_02_lod1
+    3300008: MM_Swords_01_01_lod0
+    3300010: MM_Swords_01_01_lod1
+    3300012: MM_Swords_01_02_lod0
+    3300014: MM_Swords_01_02_lod1
+    3300016: MM_Axe_01_01_lod2
+    3300018: MM_Axe_01_02_lod2
+    3300020: MM_Swords_01_01_lod2
+    3300022: MM_Swords_01_02_lod2
+    4300000: MM_Swords_01_01_lod1
+    4300002: MM_Swords_01_01_lod0
+    4300004: MM_Swords_01_02_lod0
+    4300006: MM_Swords_01_02_lod1
+    4300008: MM_Axe_01_01_lod0
+    4300010: MM_Axe_01_01_lod1
+    4300012: MM_Axe_01_02_lod0
+    4300014: MM_Axe_01_02_lod1
+    4300016: MM_Axe_01_01_lod2
+    4300018: MM_Axe_01_02_lod2
+    4300020: MM_Swords_01_01_lod2
+    4300022: MM_Swords_01_02_lod2
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .439999998
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
